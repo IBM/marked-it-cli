@@ -1,7 +1,7 @@
 /**
  * marked-it-cli
  *
- * Copyright (c) 2014, 2017 IBM Corporation
+ * Copyright (c) 2018 IBM Corporation
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software
  * and associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -19,25 +19,21 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-var FILENAME_HEADER = "header-xml";
-var FILENAME_FOOTER = null;
-
 var fs = require("fs");
 var path = require("path");
-var url = require("url");
 
 var headerText, footerText;
 var logger;
 
 var NOTOC = "notoc";
 var PREFIX_TOC = "toc-";
-var COMMENT_MARKDOWN_NAVIGATION = "<!-- Markdown Navigation -->";
+var REGEX_XML_COMMENT = /^<!--[^-]+-->$/;
 
 /* the following regex is sourced from marked: https://github.com/chjj/marked */
 var REGEX_LINK = /^!?\[((?:\[[^\]]*\]|[^\[\]]|\](?=[^\[]*\]))*)\]\(\s*<?([\s\S]*?)>?(?:\s+['"]([\s\S]*?)['"])?\s*\)/;
 
 var html = {};
-var xml = {toc: {file: {}}};
+var json = {toc: {file: {}}};
 
 html.onHeading = function(html, data) {
 	var heading = data.htmlToDom(html)[0];
@@ -54,32 +50,31 @@ html.onHeading = function(html, data) {
 	return data.domToHtml(heading);
 };
 
-xml.toc.onTopic = function(topic, data) {
+json.toc.onTopic = function(topic, data) {
 	var heading = data.htmlToDom(data.heading)[0];
 	var attributes = heading.attribs;
 	if (attributes[NOTOC]) {
 		return ""; /* do not generate a TOC entry for this header */
 	}
 
-	var topicDom = data.htmlToDom(topic)[0];
-	var changed = false;
+	var topicDom = JSON.parse(topic);
+	var properties = {};
 	Object.keys(attributes).forEach(function(key) {
 		if (key.indexOf(PREFIX_TOC) === 0) {
 			var name = key.substring(PREFIX_TOC.length);
-			var property = data.htmlToDom("<property name='" + name + "' value='" + attributes[key] + "'>\n</property>\n")[0];
-			data.domUtils.appendChild(topicDom, property);
-			changed = true;
+			properties[name] = attributes[key];
 		}
 	});
 
-	if (!changed) {
+	if (!Object.keys(properties).length) {
 		return; /* no change */
 	}
 
-	return data.domToHtml(topicDom, {xmlMode: true});
+	topicDom.properties = properties;
+	return JSON.stringify(topicDom);
 };
 
-xml.toc.onComplete = function(xml, data) {
+json.toc.onComplete = function(json, data) {
 	if (!headerText && !footerText) {
 		return; /* no change */
 	}
@@ -88,7 +83,7 @@ xml.toc.onComplete = function(xml, data) {
 	if (headerText) {
 		result += headerText;
 	}
-	result += xml;
+	result += json;
 	if (footerText) {
 		result += footerText;
 	}
@@ -99,7 +94,7 @@ xml.toc.onComplete = function(xml, data) {
 var navgroup;
 var lastDestination;
 
-xml.toc.file.onGenerate = function(content, data) {
+json.toc.file.onGenerate = function(content, data) {
 	var CLASS_TOC = "toc";
 	var CLASS_NAVGROUP = "navgroup";
 	var CLASS_NAVGROUP_END = "navgroup-end";
@@ -114,7 +109,7 @@ xml.toc.file.onGenerate = function(content, data) {
 		navgroup = null;
 	}
 
-	if (content === COMMENT_MARKDOWN_NAVIGATION) {
+	if (REGEX_XML_COMMENT.test(content)) {
 		return ""; /* explicitly want this to not go through into the generated TOC */
 	}
 
@@ -157,60 +152,49 @@ xml.toc.file.onGenerate = function(content, data) {
 		navgroup = null;
 	}
 
-	var element;
+	var result;
 
 	/* if injecting TOC from a .md file then replace all immediate children with <anchor>s */
 	if (/\.md\s*$/.test(data.source)) {
-		element = data.htmlToDom("<root></root>", {xmlMode: true})[0];
-		var docRoots = data.htmlToDom(content, {xmlMode: true});
-		docRoots.forEach(function(docRoot) {
-			data.domUtils.appendChild(element, docRoot);
-			if (docRoot.name === "topic") {
-				var children = data.domUtils.getChildren(docRoot);
-				children.forEach(function(child) {
-					if (child.attribs) {
-						var anchorElement = data.htmlToDom('<property name="type" value="anchor" />', {xmlMode: true})[0];
-						var childChildren = data.domUtils.getChildren(child);
-						if (childChildren.length) {
-							data.domUtils.prepend(childChildren[0], anchorElement);
-						} else {
-							data.domUtils.appendChild(child, anchorElement);
-						}
+		result = {};
+		var obj = {};
+		try {
+			obj = JSON.parse(content);
+		} catch (e) {
+			/* very likely a case of a toc file pointing at a non-existent .md file */
+			logger.warning("Skipping generation of toc item pointing at '" + data.source + "'.  The target file likely does not exist.");
+			result = content;
+		}
+
+		Object.keys(obj).forEach(function(key) {
+			var child = result[key] = obj[key];
+			if (key === "topics") {
+				child.forEach(function(topTopic) {
+					(topTopic.topics || []).forEach(function(anchorTopic) {
+						anchorTopic.properties = anchorTopic.properties || [];
+						anchorTopic.properties.splice(0, 0, {name: "type", value: "anchor"});
+					});
+					
+					Object.keys(data.attributes).forEach(function(key) {
+						topTopic.properties = topTopic.properties || [];
+						topTopic.properties.splice(0, 0, {name: key, value: data.attributes[key]});
+					});
+					
+					if (navgroup && data.level === navgroup.level) {
+						topTopic.properties = topTopic.properties || [];
+						topTopic.properties.splice(0, 0, {name: "navgroup", value: navgroup.id});
 					}
 				});
-
-				var keys = Object.keys(data.attributes);
-				if (keys) {
-					keys.forEach(function(key) {
-						var propertyElement = data.htmlToDom('<property name="' + key + '" value="' + data.attributes[key] + '" />\n', {xmlMode: true})[0];
-						var elementChildren = data.domUtils.getChildren(docRoot);
-						if (elementChildren.length) {
-							data.domUtils.prepend(elementChildren[0], propertyElement);
-						} else {
-							data.domUtils.appendChild(docRoot, propertyElement);
-						}
-					});
-				}
-
-				if (navgroup && data.level === navgroup.level) {
-					var navgroupElement = data.htmlToDom('<property name="navgroup" value="' + navgroup.id + '" />', {xmlMode: true})[0];
-					var elementChildren = data.domUtils.getChildren(docRoot);
-					if (elementChildren.length) {
-						data.domUtils.prepend(elementChildren[0], navgroupElement);
-					} else {
-						data.domUtils.appendChild(docRoot, navgroupElement);
-					}
-				}
 			}
 		});
 		navgroup = clearNavgroupAtEnd ? null : navgroup;
-		return data.domToInnerHtml(element, {xmlMode: true});
+		return JSON.stringify(result);
 	}
 
 	var match = REGEX_LINK.exec(data.source);
 	if (match) {
 		/* link to external content */
-		element = data.htmlToDom('<topic href="' + match[2] + '" label="' + match[1] + '" />', {xmlMode: true})[0];
+		result = {href: match[2], label: match[1]};
 	} else {
 		/* check for custom elements this extension knows how to generate */
 		var classes = data.attributes[ATTRIBUTE_CLASS];
@@ -219,68 +203,39 @@ xml.toc.file.onGenerate = function(content, data) {
 			for (var i = 0; i < classes.length; i++) {
 				var current = classes[i].toLowerCase();
 				if (current === CLASS_TOC) {
-					var propertiesString = "";
+					result = {toc: {label: data.source}};
 					var keys = Object.keys(data.attributes);
 					keys.forEach(function(key) {
 						if (key.toLowerCase() !== ATTRIBUTE_CLASS) {
-							propertiesString += '<property name="' + key + '" value="' + data.attributes[key] + '" />\n';
+							result.toc.properties = result.toc.properties || [];
+							result.toc.properties.push({name: key, value: data.attributes[key]});
 						}			
 					});
-					element = data.htmlToDom('<toc label="' + data.source + '">\n' + propertiesString + '</toc>', {xmlMode: true})[0];
 					break;
 				}
 				if (current === CLASS_TOPICGROUP) {
-					element = data.htmlToDom('<topic label="' + data.source + '"><property name="topicgroup" value="' + data.source + '" /></topic>', {xmlMode: true})[0];
+					result = {label: data.source, properties: [{name: "topicgroup", value: data.source}]};
 					break;
 				}
 			}
 		}
 	}
 
-	if (element && navgroup && data.level === navgroup.level) {
-		var navgroupElement = data.htmlToDom('<property name="navgroup" value="' + navgroup.id + '" />', {xmlMode: true})[0];
-		var elementChildren = data.domUtils.getChildren(element);
-		if (elementChildren.length) {
-			data.domUtils.prepend(elementChildren[0], navgroupElement);
-		} else {
-			data.domUtils.appendChild(element, navgroupElement);
-		}
+	if (result && navgroup && data.level === navgroup.level) {
+		var target = result.toc || result;
+		target.properties = target.properties || [];
+		target.properties.push({name: "navgroup", value: navgroup.id});
 	}
 
 	navgroup = clearNavgroupAtEnd ? null : navgroup;
-	return element ? data.domToHtml(element, {xmlMode: true}) : null;
+	return result ? JSON.stringify(result) : null;
 };
 
 var init = function(data) {
 	logger = data.logger;
-	if (FILENAME_HEADER) {
-		var headerPath = path.join(__dirname, FILENAME_HEADER);
-		try {
-			var fd = fs.openSync(headerPath, "r");
-		} catch (e) {
-			logger.error("Failed to open XML header file: " + headerPath + "\n" + e.toString());
-		}
-		if (fd) {
-			headerText = data.readFile(fd);
-			fs.closeSync(fd);
-		}
-	}
-
-	if (FILENAME_FOOTER) {
-		var footerPath = path.join(__dirname, FILENAME_FOOTER);
-		try {
-			var fd = fs.openSync(footerPath, "r");
-		} catch (e) {
-			logger.error("Failed to open XML footer file: " + footerPath + "\n" + e.toString());
-		}
-		if (fd) {
-			footerText = data.readFile(fd);
-			fs.closeSync(fd);
-		}
-	}
 };
 
-module.exports.id = "xmlTOC";
+module.exports.id = "jsonTOC";
 module.exports.init = init;
 module.exports.html = html;
-module.exports.xml = xml;
+module.exports.json = json;

@@ -34,6 +34,7 @@ var SWITCH_PDF = "--gen-pdf";
 var SWITCH_VERBOSE = "--verbose";
 var SWITCH_DEBUG = "--debug";
 var SWITCH_TOCXML = "--toc-xml";
+var SWITCH_TOCJSON = "--toc-json";
 var OPTION_TOC_DEPTH = "--toc-depth";
 var OPTION_PDFOPTIONSFILE = "--pdf-options-file";
 var OPTION_EXTENSIONFILE = "--extension-file";
@@ -48,7 +49,7 @@ var sourceDir, destDir;
 var overwrite, disableAttributes, disableFrontMatter, genPdf, verbose, debug;
 var headerFile, footerFile, pdfOptionsFile, conrefFile;
 var extensionFiles = [];
-var tocXML, tocDepth;
+var tocJSON, tocXML, tocDepth;
 var help;
 
 var switchCounter = 0;
@@ -70,6 +71,8 @@ process.argv.forEach(function(arg) {
 		debug = true;
 	} else if (arg.indexOf(SWITCH_TOCXML) === 0) {
 		tocXML = true;
+	} else if (arg.indexOf(SWITCH_TOCJSON) === 0) {
+		tocJSON = true;
 	} else if (arg.indexOf(OPTION_TOC_DEPTH) === 0 && arg.indexOf("=") !== -1) {
 		tocDepth = arg.substring(arg.indexOf("=") + 1);
 	} else if (arg.indexOf(OPTION_PDFOPTIONSFILE) === 0 && arg.indexOf("=") !== -1) {
@@ -123,6 +126,7 @@ if (help || !sourceDir || !destDir) {
 		generatePdf: genPdf,
 		pdfOptionsFile: pdfOptionsFile,
 		extensionFiles: extensionFiles,
+		tocJSON: tocJSON,
 		tocXML: tocXML,
 		tocDepth: tocDepth,
 		headerFile: headerFile,
@@ -145,6 +149,8 @@ function outputHelpPage() {
 	console.log("\tDisable processing of Kramdown-style attribute lists");
 	console.log(SWITCH_FRONTMATTER);
 	console.log("\tDisable processing of Jekyll-style front matter blocks");
+	console.log(SWITCH_TOCJSON);
+	console.log("\tGenerate a toc.json file for directories containing a valid toc file");
 	console.log(SWITCH_TOCXML);
 	console.log("\tGenerate a toc.xml file for directories containing a valid toc file");
 	console.log(OPTION_TOC_DEPTH + "=<maxHeaderLevel>");
