@@ -2,6 +2,9 @@
 
 This project uses [semantic versioning](http://semver.org/).
 
+## [0.10.1] 2018-08-13
+Merged fixes for example/makeApidocsJson.js.
+
 ## [0.10.0] 2018-08-13
 ### New features
 Support has been added for generating TOCs in JSON format.  To use this, specify command-line arguments `--extension-file=./example/jsonTocExt.js`, and **toc.json** files will be written for directories whose source contains a toc file.
