@@ -2,6 +2,9 @@
 
 This project uses [semantic versioning](http://semver.org/).
 
+## [0.10.2] 2018-08-13
+Bump up required version of marked-it-core package.
+
 ## [0.10.1] 2018-08-13
 Merged fixes for example/makeApidocsJson.js.
 
