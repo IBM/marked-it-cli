@@ -2,6 +2,9 @@
 
 This project uses [semantic versioning](http://semver.org/).
 
+## [0.10.4] 2018-09-24
+Added example/generateSectionsExt.js.
+
 ## [0.10.3] 2018-08-13
 Fix the CHANGELOG.
 
