@@ -36,7 +36,7 @@ function processHeaders(level, dom, data) {
 		var current = headers[i];
 		var id = data.domUtils.getAttributeValue(current, "id");
 		if (!id) {
-			logger.warning("Header has no id, so not generating an accompanying <section>: " + current.children[0].data);
+			logger.warning("Header has no id, so not generating an accompanying <section>: " + data.sourcePath + " : '" + current.children[0].data + "'");
 			continue;
 		}
 
@@ -75,5 +75,5 @@ var init = function(data) {
 };
 
 module.exports.html = html;
-module.exports.id = "createSections";
+module.exports.id = "generateSections";
 module.exports.init = init;
