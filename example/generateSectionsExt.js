@@ -39,34 +39,25 @@ function processHeaders(level, dom, data) {
 			logger.warning("Header has no id, so not generating an accompanying <section>: " + current.children[0].data);
 			continue;
 		}
-		var index = -1;
-		var siblings = data.domUtils.getSiblings(current);
-		for (var j = 0; j < siblings.length; j++) {
-			if (siblings[j] === current) {
-				index = j;
-				break;
-			}
-		}
+
+		var next = current.next;
 		var section = data.htmlToDom("<section id='section-" + id + "'></section>")[0];
 		data.domUtils.replaceElement(current, section);
 		data.domUtils.appendChild(section, current);
-		index++; /* now points at first sibling after the header-turned-section */
 
-		/* 
-		 * The #removeElement invocation in the loop removes siblings in-place,
-		 * so should NOT iterate over them incrementally, just stay at `index`.
-		 */
-		while (index < siblings.length) {
-			var sibling = siblings[index];
-			var result = REGEX_HEADER.exec(sibling.name);
+		current = next;
+		while (current) {
+			var result = REGEX_HEADER.exec(current.name);
 			if (result) {
 				var siblingLevel = parseInt(result[1]);
 				if (siblingLevel <= level) {
 					break;
 				}
 			}
-			data.domUtils.removeElement(sibling);
-			data.domUtils.appendChild(section, sibling);
+			next = current.next;
+			data.domUtils.removeElement(current);
+			data.domUtils.appendChild(section, current);
+			current = next;
 		}
 	}
 }
