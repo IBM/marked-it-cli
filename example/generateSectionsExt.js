@@ -40,8 +40,16 @@ function processHeaders(level, dom, data) {
 			continue;
 		}
 
+		var section = data.htmlToDom("<section id='section-" + id + "'></section>")[0];		
+		var keys = Object.keys(current.attribs);
+		keys.forEach(function(key) {
+			if (key !== "id") {
+				section.attribs[key] = current.attribs[key];
+				delete current.attribs[key]
+			}
+		});
+
 		var next = current.next;
-		var section = data.htmlToDom("<section id='section-" + id + "'></section>")[0];
 		data.domUtils.replaceElement(current, section);
 		data.domUtils.appendChild(section, current);
 
