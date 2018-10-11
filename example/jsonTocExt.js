@@ -66,12 +66,19 @@ json.toc.onTopic = function(topic, data) {
 		}
 	});
 
-	if (!Object.keys(properties).length) {
-		return; /* no change */
+	var changed;
+	if (Object.keys(properties).length) {
+		topicDom.properties = properties;
+		changed = true;
 	}
 
-	topicDom.properties = properties;
-	return JSON.stringify(topicDom);
+	var unescapedLabel = unescape(topicDom.label);
+	if (topicDom.label !== unescapedLabel) {
+		topicDom.label = unescapedLabel;
+		changed = true;
+	}
+
+	return changed ? JSON.stringify(topicDom) : undefined;
 };
 
 json.toc.onComplete = function(json, data) {
@@ -233,6 +240,15 @@ json.toc.file.onGenerate = function(content, data) {
 
 var init = function(data) {
 	logger = data.logger;
+};
+
+var unescape = function(string) {
+	return string
+		.replace(/&lt;/g, '<')
+		.replace(/&gt;/g, '>')
+		.replace(/&quot;/g, '"')
+		.replace(/&amp;/g, '&')
+		.replace(/&#39;/g, "'");
 };
 
 module.exports.id = "jsonTOC";

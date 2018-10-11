@@ -2,6 +2,9 @@
 
 This project uses [semantic versioning](http://semver.org/).
 
+## [0.10.8] 2018-10-11
+Unescape topic labels in JSON TOCs.
+
 ## [0.10.7] 2018-10-11
 Consume the latest marked-it-core.
 
