@@ -2,6 +2,9 @@
 
 This project uses [semantic versioning](http://semver.org/).
 
+## [0.10.7] 2018-10-11
+Consume the latest marked-it-core.
+
 ## [0.10.6] 2018-10-05
 Modified example/generateSectionsExt.js to move header attributes into containing section element.
 
