@@ -160,12 +160,19 @@ html.onComplete = (html, data) => {
   const newHtml = data.replaceVariables(html, null, localMap);
   const dom = common.htmlToDom(newHtml);
   const sections = [{ name: '', dom: [] }];
-  dom.forEach((node) => {
+  dom.forEach((n) => {
+    const node = { ...n };
+    // h3 as the sub-level under h1
+    if (node.name === 'h3') {
+      node.name = 'h1';
+      node.originalName = 'h3';
+    }
     if (node.type === 'tag' && node.name === 'h1') {
       sections.push({
         name: common.domToInnerHtml(node),
         id: node.attribs['id'],
         dom: [],
+        level: node.originalName,
       });
     }
     sections[sections.length - 1].dom.push(node);
