@@ -96,6 +96,17 @@ xml.toc.onComplete = function(xml, data) {
 	return result;
 };
 
+function adjustHrefs(obj, pathPrefix) {
+	if (obj.attribs && obj.attribs.href) {
+		obj.attribs.href = path.join(pathPrefix, obj.attribs.href);
+	}
+	if (obj.children) {
+		obj.children.forEach(function(current) {
+			adjustHrefs(current, pathPrefix);
+		});
+	}
+}
+
 var navgroup;
 var lastDestination;
 
@@ -203,6 +214,11 @@ xml.toc.file.onGenerate = function(content, data) {
 				}
 			}
 		});
+
+		if (data.pathPrefix) {
+			adjustHrefs(element, data.pathPrefix);
+		}
+
 		navgroup = clearNavgroupAtEnd ? null : navgroup;
 		return data.domToInnerHtml(element, {xmlMode: true});
 	}

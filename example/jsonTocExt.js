@@ -98,6 +98,17 @@ json.toc.onComplete = function(json, data) {
 	return result;
 };
 
+function adjustHrefs(obj, pathPrefix) {
+	if (obj.href) {
+		obj.href = path.join(pathPrefix, obj.href);
+	}
+	if (obj.topics) {
+		obj.topics.forEach(function(current) {
+			adjustHrefs(current, pathPrefix);
+		});
+	}
+}
+
 var navgroup;
 var lastDestination;
 
@@ -194,6 +205,11 @@ json.toc.file.onGenerate = function(content, data) {
 				});
 			}
 		});
+		
+		if (data.pathPrefix) {
+			adjustHrefs(result, data.pathPrefix);
+		}
+		
 		navgroup = clearNavgroupAtEnd ? null : navgroup;
 		return JSON.stringify(result);
 	}

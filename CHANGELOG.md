@@ -2,6 +2,9 @@
 
 This project uses [semantic versioning](http://semver.org/).
 
+## [0.11.0] 2018-10-16
+Added a `path` attribute on the `data` object that gets passed to `xml.toc.file.onGenerate` and `json.toc.file.onGenerate` extension implementations. The "examples" extensions that implement these extension points now prefix generated hrefs with the received path value.
+
 ## [0.10.8] 2018-10-11
 Unescape topic labels in JSON TOCs.
 
