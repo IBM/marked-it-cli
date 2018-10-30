@@ -2,6 +2,9 @@
 
 This project uses [semantic versioning](http://semver.org/).
 
+## [0.12.0] 2018-10-30
+Enabled creation of toc links to folders that do not exist locally if the link path is absolute.
+
 ## [0.11.0] 2018-10-16
 Added a `path` attribute on the `data` object that gets passed to `xml.toc.file.onGenerate` and `json.toc.file.onGenerate` extension implementations. The "examples" extensions that implement these extension points now prefix generated hrefs with the received path value.
 
