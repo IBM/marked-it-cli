@@ -2,6 +2,9 @@
 
 This project uses [semantic versioning](http://semver.org/).
 
+## [0.13.1] 2018-11-20
+Added 'id' attributes on TOC topics.
+
 ## [0.13.0] 2018-11-07
 Modified creation of toc links to folders that do not exist locally.
 
