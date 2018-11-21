@@ -2,6 +2,9 @@
 
 This project uses [semantic versioning](http://semver.org/).
 
+## [0.13.2] 2018-11-21
+Fixed the computation of a TOC id's root folder segment.
+
 ## [0.13.1] 2018-11-20
 Added 'id' attributes on TOC topics.
 
