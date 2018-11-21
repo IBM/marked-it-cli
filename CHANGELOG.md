@@ -2,7 +2,7 @@
 
 This project uses [semantic versioning](http://semver.org/).
 
-## [0.13.2 and 0.13.3] 2018-11-21
+## [0.13.2 - 0.13.4] 2018-11-21
 Fixed the computation of a TOC id's root folder segment.
 
 ## [0.13.1] 2018-11-20
