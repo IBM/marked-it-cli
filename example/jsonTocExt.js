@@ -112,6 +112,15 @@ function adjustHrefs(obj, pathPrefix) {
 var navgroup;
 var lastDestination;
 
+function setTopicIds(object, prefix) {
+	if (object.id) {
+		object.id = prefix + "-" + object.id;
+	}
+	(object.topics || []).forEach(function(current) {
+		setTopicIds(current, prefix);
+	});
+}
+
 json.toc.file.onGenerate = function(content, data) {
 	var CLASS_TOC = "toc";
 	var CLASS_NAVGROUP = "navgroup";
@@ -208,6 +217,7 @@ json.toc.file.onGenerate = function(content, data) {
 		
 		if (data.pathPrefix) {
 			adjustHrefs(result, data.pathPrefix);
+			setTopicIds(result, data.pathPrefix);
 		}
 		
 		navgroup = clearNavgroupAtEnd ? null : navgroup;
