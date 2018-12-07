@@ -2,6 +2,9 @@
 
 This project uses [semantic versioning](http://semver.org/).
 
+## [0.13.6] 2018-12-07
+Fixed: Variables defined in front matter are not being substituted into generated headers/footers.
+
 ## [0.13.2 - 0.13.5] 2018-11-21
 Fixed the computation of a TOC id's root folder segment.
 

@@ -157,7 +157,7 @@ html.onComplete = (html, data) => {
     console.log(`Failed to parse ${swaggerPath}:`, e);
     localMap.swagger = { info: {} };
   }
-  const newHtml = data.replaceVariables(html, null, localMap);
+  const newHtml = data.replaceVariables(html, [localMap]);
   const dom = common.htmlToDom(newHtml);
   const sections = [{ name: '', dom: [] }];
   dom.forEach((n) => {
