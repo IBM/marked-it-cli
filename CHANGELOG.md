@@ -2,6 +2,9 @@
 
 This project uses [semantic versioning](http://semver.org/).
 
+## [0.13.7] 2019-01-15
+Changed how topic ids are computed, to use `subcollection`.
+
 ## [0.13.6] 2018-12-07
 Fixed: Variables defined in front matter are not being substituted into generated headers/footers.
 

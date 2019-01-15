@@ -217,7 +217,7 @@ json.toc.file.onGenerate = function(content, data) {
 		
 		if (data.pathPrefix) {
 			adjustHrefs(result, data.pathPrefix);
-			setTopicIds(result, data.pathPrefix);
+			setTopicIds(result, data.subcollection || data.pathPrefix);
 		}
 		
 		navgroup = clearNavgroupAtEnd ? null : navgroup;
