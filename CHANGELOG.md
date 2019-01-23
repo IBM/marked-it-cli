@@ -2,6 +2,9 @@
 
 This project uses [semantic versioning](http://semver.org/).
 
+## [0.14.1] 2019-01-23
+Added extension points `file.dir.shouldProcess`, `file.md.shouldGenerate` and `file.shouldCopy`.
+
 ## [0.13.7] 2019-01-15
 Changed how topic ids are computed, to use `subcollection`.
 
