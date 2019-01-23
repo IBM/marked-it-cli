@@ -18,20 +18,41 @@
  * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
+var fs = require("fs");
+var parser = require("gitignore-parser");
+var path = require("path")
 
-var file = {md: {}};
+var file = {dir: {}, md: {}};
 
-file.dir.shouldProcess = function(defaultValue, data) {
-	return defaultValue;
+var baseSourcePath, gitIgnorer;
+
+var init = function(data) {
+	baseSourcePath = data.sourcePath;
+	var gitIgnorePath = path.join(data.sourcePath, '.gitignore');
+	var gitIgnoreContent;
+	try {
+		gitIgnoreContent = fs.readFileSync(gitIgnorePath, 'utf8');
+	} catch(e) {
+		data.logger.warning("Failed to read a .gitignore file, error code: " + e.code);
+	}
+	if (gitIgnoreContent) {
+		gitIgnorer = parser.compile(gitIgnoreContent);
+	}
 };
 
-file.md.shouldGenerate = function(defaultValue, data) {
-	return defaultValue;
-};
+function shouldDoIt(defaultValue, data) {
+	if (!gitIgnorer || !defaultValue) {
+		return defaultValue;
+	}
 
-file.shouldCopy = function(defaultValue, data) {
-	return defaultValue;
-};
+	var relativePath = path.relative(baseSourcePath, data.sourcePath);
+	return gitIgnorer.accepts(relativePath);
+}
+
+file.dir.shouldProcess = shouldDoIt;
+file.md.shouldGenerate = shouldDoIt;
+file.shouldCopy = shouldDoIt;
 
 module.exports.id = "fileFilterExt";
 module.exports.file = file;
+module.exports.init = init;
