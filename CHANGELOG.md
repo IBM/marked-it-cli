@@ -2,7 +2,10 @@
 
 This project uses [semantic versioning](http://semver.org/).
 
-## [0.14.1] 2019-01-23
+## [0.14.1] 2019-01-28
+Added checking of the `file.dir.shouldProcess` extension point during TOC generation.
+
+## [0.14.0] 2019-01-23
 Added extension points `file.dir.shouldProcess`, `file.md.shouldGenerate` and `file.shouldCopy`.
 
 ## [0.13.7] 2019-01-15
