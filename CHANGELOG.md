@@ -2,6 +2,9 @@
 
 This project uses [semantic versioning](http://semver.org/).
 
+## [0.14.2] 2019-02-08
+Pick up the latest marked-it fixes.
+
 ## [0.14.1] 2019-01-28
 Added checking of the `file.dir.shouldProcess` extension point during TOC generation.
 
