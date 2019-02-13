@@ -2,6 +2,9 @@
 
 This project uses [semantic versioning](http://semver.org/).
 
+## [0.15.0] 2019-02-13
+Pick up the latest marked-it changes, which include adoption of marked v0.3.9.
+
 ## [0.14.2] 2019-02-08
 Pick up the latest marked-it fixes.
 
