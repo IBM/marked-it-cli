@@ -2,6 +2,9 @@
 
 This project uses [semantic versioning](http://semver.org/).
 
+## [0.16.0] 2019-03-19
+Pick up the latest marked-it changes, and augment example/accessibilityExt.js.
+
 ## [0.15.0] 2019-02-13
 Pick up the latest marked-it changes, which include adoption of marked v0.3.9.
 

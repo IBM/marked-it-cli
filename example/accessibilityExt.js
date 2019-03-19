@@ -24,6 +24,18 @@ var html = {};
 var CAPTION = "caption";
 var CAPTION_SIDE = "caption-side";
 
+html.onImage = function(html, data) {
+	var image = data.htmlToDom(html)[0];
+	var captionText = image.attribs[CAPTION];
+	if (!captionText) {
+		return; /* nothing to do */
+	}
+
+	delete image.attribs[CAPTION];
+	var figure = data.htmlToDom("<figure>\n<figcaption>" + captionText + "</figcaption>\n" + data.domToHtml(image) + "\n</figure>\n")[0];
+	return data.domToHtml(figure);
+};
+
 html.onTable = function(html, data) {
 	var table = data.htmlToDom(html)[0];
 	var captionText = table.attribs[CAPTION];
@@ -45,7 +57,7 @@ html.onTable = function(html, data) {
 	data.domUtils.prepend(children[0], caption);
 
 	return data.domToHtml(table);
-}
+};
 
 module.exports.html = html;
 module.exports.id = "accessibility";
