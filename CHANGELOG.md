@@ -2,6 +2,9 @@
 
 This project uses [semantic versioning](http://semver.org/).
 
+## [0.16.1] 2019-03-20
+example/accessibilityExt.js: Add support for <figcaption> `caption-side` attribute.
+
 ## [0.16.0] 2019-03-19
 Pick up the latest marked-it changes, and augment example/accessibilityExt.js.
 
