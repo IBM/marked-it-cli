@@ -31,8 +31,16 @@ html.onImage = function(html, data) {
 		return; /* nothing to do */
 	}
 
+	var captionSide = image.attribs[CAPTION_SIDE];
 	delete image.attribs[CAPTION];
-	var figure = data.htmlToDom("<figure>\n<figcaption>" + captionText + "</figcaption>\n" + data.domToHtml(image) + "\n</figure>\n")[0];
+	delete image.attribs[CAPTION_SIDE];
+
+	var figure;
+	if ( captionSide === 'bottom' ) {
+		figure = data.htmlToDom("<figure>\n" + data.domToHtml(image) + "\n<figcaption>" + captionText + "</figcaption>\n</figure>\n")[0];
+	} else {
+		figure = data.htmlToDom("<figure>\n<figcaption>" + captionText + "</figcaption>\n" + data.domToHtml(image) + "\n</figure>\n")[0];
+	}
 	return data.domToHtml(figure);
 };
 
