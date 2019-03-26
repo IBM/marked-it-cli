@@ -23,6 +23,7 @@ var html = {};
 
 var CAPTION = "caption";
 var CAPTION_SIDE = "caption-side";
+var ROW_HEADERS = "row-headers";
 
 html.onImage = function(html, data) {
 	var image = data.htmlToDom(html)[0];
@@ -44,7 +45,7 @@ html.onImage = function(html, data) {
 	return data.domToHtml(figure);
 };
 
-html.onTable = function(html, data) {
+function processCaptions(html, data) {
 	var table = data.htmlToDom(html)[0];
 	var captionText = table.attribs[CAPTION];
 	if (!captionText) {
@@ -65,6 +66,47 @@ html.onTable = function(html, data) {
 	data.domUtils.prepend(children[0], caption);
 
 	return data.domToHtml(table);
+}
+
+function processRowHeaders(html, data) {
+	var table = data.htmlToDom(html)[0];
+	if (!table.attribs[ROW_HEADERS]) {
+		return; /* nothing to do */
+	}
+
+	delete table.attribs[ROW_HEADERS];
+
+	var tbody = data.domUtils.find(function(node) {return node.name === "tbody";}, table.children, false, 1)[0];
+	if (!tbody) {
+		return; /* nothing to do */		
+	}
+
+	var thead = data.domUtils.find(function(node) {return node.name === "thead";}, table.children, false, 1)[0];
+	if (thead) {
+		/* add scope="col" attribute on each top-row header item */
+		var ths = data.domUtils.find(function(node) {return node.name === "th";}, thead.children, true, Infinity);		
+		ths.forEach(function(th) {
+			th.attribs.scope = "col";
+		});
+	}
+
+	/* for the first cell in each row change its type to "th" and add scope="row" */
+	var trs = data.domUtils.find(function(node) {return node.name === "tr";}, tbody.children, false, Infinity);
+	trs.forEach(function(tr) {
+		var td = data.domUtils.find(function(node) {return node.name === "td";}, tr.children, false, 1)[0];
+		if (td) {
+			td.name = "th";
+			td.attribs.scope = "row";
+		}
+	});
+	
+	return data.domToHtml(table);
+}
+
+html.onTable = function(html, data) {
+	var result1 = processCaptions(html, data);
+	var result2 = processRowHeaders(result1 || html, data);
+	return result2 || result1;
 };
 
 module.exports.html = html;
