@@ -2,6 +2,9 @@
 
 This project uses [semantic versioning](http://semver.org/).
 
+## [0.17.0] 2019-03-27
+Added `escape` and `unescape` functions to the data passed to some types of extensions.
+
 ## [0.16.2] 2019-03-26
 example/accessibilityExt.js: Add support for table row headers.
 

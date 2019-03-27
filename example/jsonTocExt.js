@@ -72,7 +72,7 @@ json.toc.onTopic = function(topic, data) {
 		changed = true;
 	}
 
-	var unescapedLabel = unescape(topicDom.label);
+	var unescapedLabel = data.unescape(topicDom.label);
 	if (topicDom.label !== unescapedLabel) {
 		topicDom.label = unescapedLabel;
 		changed = true;
@@ -266,15 +266,6 @@ json.toc.file.onGenerate = function(content, data) {
 
 var init = function(data) {
 	logger = data.logger;
-};
-
-var unescape = function(string) {
-	return string
-		.replace(/&lt;/g, '<')
-		.replace(/&gt;/g, '>')
-		.replace(/&quot;/g, '"')
-		.replace(/&amp;/g, '&')
-		.replace(/&#39;/g, "'");
 };
 
 module.exports.id = "jsonTOC";
