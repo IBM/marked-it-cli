@@ -37,7 +37,7 @@ html.onImage = function(html, data) {
 	delete image.attribs[CAPTION_SIDE];
 
 	var figure;
-	if ( captionSide === 'bottom' ) {
+	if (captionSide === "bottom") {
 		figure = data.htmlToDom("<figure>\n" + data.domToHtml(image) + "\n<figcaption>" + captionText + "</figcaption>\n</figure>\n")[0];
 	} else {
 		figure = data.htmlToDom("<figure>\n<figcaption>" + captionText + "</figcaption>\n" + data.domToHtml(image) + "\n</figure>\n")[0];
@@ -70,7 +70,7 @@ function processCaptions(html, data) {
 
 function processRowHeaders(html, data) {
 	var table = data.htmlToDom(html)[0];
-	if (!table.attribs[ROW_HEADERS]) {
+	if (table.attribs[ROW_HEADERS] === undefined) {
 		return; /* nothing to do */
 	}
 

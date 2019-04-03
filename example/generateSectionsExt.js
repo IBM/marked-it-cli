@@ -45,7 +45,7 @@ function processHeaders(level, dom, data) {
 		keys.forEach(function(key) {
 			if (key !== "id") {
 				section.attribs[key] = current.attribs[key];
-				delete current.attribs[key]
+				delete current.attribs[key];
 			}
 		});
 

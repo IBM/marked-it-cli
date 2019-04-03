@@ -2,6 +2,9 @@
 
 This project uses [semantic versioning](http://semver.org/).
 
+## [0.17.2] 2019-04-03
+Fixes to a couple of example extensions.
+
 ## [0.17.1] 2019-03-27
 Released updated package-lock.json.
 
