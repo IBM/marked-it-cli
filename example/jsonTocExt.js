@@ -39,7 +39,7 @@ html.onHeading = function(html, data) {
 	var heading = data.htmlToDom(html)[0];
 	var changed = false;
 	Object.keys(heading.attribs).forEach(function(key) {
-		if (key.indexOf(PREFIX_TOC) === 0) {
+		if (key === NOTOC || key.indexOf(PREFIX_TOC) === 0) {
 			delete heading.attribs[key];
 			changed = true;
 		}
@@ -53,21 +53,21 @@ html.onHeading = function(html, data) {
 json.toc.onTopic = function(topic, data) {
 	var heading = data.htmlToDom(data.heading)[0];
 	var attributes = heading.attribs;
-	if (attributes[NOTOC]) {
+	if (attributes[NOTOC] !== undefined) {
 		return ""; /* do not generate a TOC entry for this header */
 	}
 
 	var topicDom = JSON.parse(topic);
-	var properties = {};
+	var properties = [];
 	Object.keys(attributes).forEach(function(key) {
 		if (key.indexOf(PREFIX_TOC) === 0) {
 			var name = key.substring(PREFIX_TOC.length);
-			properties[name] = attributes[key];
+			properties.push({name: name, value: attributes[key]});
 		}
 	});
 
 	var changed;
-	if (Object.keys(properties).length) {
+	if (properties.length) {
 		topicDom.properties = properties;
 		changed = true;
 	}
