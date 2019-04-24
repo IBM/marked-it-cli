@@ -2,8 +2,11 @@
 
 This project uses [semantic versioning](http://semver.org/).
 
+## [0.17.3] 2019-04-24
+example/accessibilityExt.js: Added support for table `summary` attribute.
+
 ## [0.17.2] 2019-04-03
-Fixes to a couple of example extensions.
+Released fixes to a couple of example extensions.
 
 ## [0.17.1] 2019-03-27
 Released updated package-lock.json.
@@ -12,19 +15,19 @@ Released updated package-lock.json.
 Added `escape` and `unescape` functions to the data passed to some types of extensions.
 
 ## [0.16.2] 2019-03-26
-example/accessibilityExt.js: Add support for table row headers.
+example/accessibilityExt.js: Added support for table row headers.
 
 ## [0.16.1] 2019-03-20
-example/accessibilityExt.js: Add support for <figcaption> `caption-side` attribute.
+example/accessibilityExt.js: Added support for <figcaption> `caption-side` attribute.
 
 ## [0.16.0] 2019-03-19
-Pick up the latest marked-it changes, and augment example/accessibilityExt.js.
+Picked up the latest marked-it changes, and augment example/accessibilityExt.js.
 
 ## [0.15.0] 2019-02-13
-Pick up the latest marked-it changes, which include adoption of marked v0.3.9.
+Picked up the latest marked-it changes, which include adoption of marked v0.3.9.
 
 ## [0.14.2] 2019-02-08
-Pick up the latest marked-it fixes.
+Picked up the latest marked-it fixes.
 
 ## [0.14.1] 2019-01-28
 Added checking of the `file.dir.shouldProcess` extension point during TOC generation.

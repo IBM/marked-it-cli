@@ -24,6 +24,7 @@ var html = {};
 var CAPTION = "caption";
 var CAPTION_SIDE = "caption-side";
 var ROW_HEADERS = "row-headers";
+var SUMMARY = "summary";
 
 html.onImage = function(html, data) {
 	var image = data.htmlToDom(html)[0];
@@ -47,14 +48,20 @@ html.onImage = function(html, data) {
 
 function processCaptions(html, data) {
 	var table = data.htmlToDom(html)[0];
-	var captionText = table.attribs[CAPTION];
-	if (!captionText) {
+	var captionText = table.attribs[CAPTION] || "";
+	var summaryText = table.attribs[SUMMARY];
+	if (!captionText && !summaryText) {
 		return; /* nothing to do */
 	}
 
 	var captionSide = table.attribs[CAPTION_SIDE];
 	delete table.attribs[CAPTION];
 	delete table.attribs[CAPTION_SIDE];
+	delete table.attribs[SUMMARY];
+
+	if (summaryText) {
+		captionText = "\n" + captionText + "<br>\n<span>" + summaryText + "</span>\n";
+	}
 
 	var caption = data.htmlToDom("<caption>" + captionText + "</caption>")[0];
 	if (captionSide) {
