@@ -60,7 +60,7 @@ function processCaptions(html, data) {
 	delete table.attribs[SUMMARY];
 
 	if (summaryText) {
-		captionText = "\n" + captionText + "<br>\n<span>" + summaryText + "</span>\n";
+		captionText = "\n" + captionText + "<br>\n<span class='table-summary'>" + summaryText + "</span>\n";
 	}
 
 	var caption = data.htmlToDom("<caption>" + captionText + "</caption>")[0];
