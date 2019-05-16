@@ -2,6 +2,9 @@
 
 This project uses [semantic versioning](http://semver.org/).
 
+## [0.17.4] 2019-05-16
+example/accessibilityExt.js: Added `aria-describedby` to tables with summary texts.
+
 ## [0.17.3] 2019-04-24
 example/accessibilityExt.js: Added support for table `summary` attribute.
 
