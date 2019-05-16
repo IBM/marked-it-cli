@@ -60,7 +60,9 @@ function processCaptions(html, data) {
 	delete table.attribs[SUMMARY];
 
 	if (summaryText) {
-		captionText = "\n" + captionText + "<br>\n<span class='table-summary'>" + summaryText + "</span>\n";
+		var spanId = "tableSummary-" + Math.floor(Math.random() * Math.floor(100000000));
+		table.attribs["aria-describedby"] = spanId;
+		captionText = "\n" + captionText + "<br>\n<span class='table-summary' id='" + spanId + "'>" + summaryText + "</span>\n";
 	}
 
 	var caption = data.htmlToDom("<caption>" + captionText + "</caption>")[0];
