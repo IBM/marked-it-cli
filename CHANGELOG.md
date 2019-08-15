@@ -2,6 +2,9 @@
 
 This project uses [semantic versioning](http://semver.org/).
 
+## [0.18.0] 2019-08-15
+Added passing of `extension-data` from a conref file to extension init() functions.
+
 ## [0.17.4] 2019-05-16
 example/accessibilityExt.js: Added `aria-describedby` to tables with summary texts.
 
