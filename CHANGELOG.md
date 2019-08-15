@@ -2,6 +2,9 @@
 
 This project uses [semantic versioning](http://semver.org/).
 
+## [0.18.1] 2019-08-15
+Bug fix for previous release.
+
 ## [0.18.0] 2019-08-15
 Added passing of `extension-data` from a conref file to extension init() functions.
 
