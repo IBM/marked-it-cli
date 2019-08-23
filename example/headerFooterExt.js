@@ -47,7 +47,7 @@ html.onComplete = function(html, data) {
 
 var init = function(data) {
 	if (FILENAME_HEADER) {
-		var headerPath = path.join(__dirname, FILENAME_HEADER);
+		var headerPath = path.resolve(__dirname, FILENAME_HEADER);
 		try {
 			var fd = fs.openSync(headerPath, "r");
 		} catch (e) {
@@ -60,7 +60,7 @@ var init = function(data) {
 	}
 
 	if (FILENAME_FOOTER) {
-		var footerPath = path.join(__dirname, FILENAME_FOOTER);
+		var footerPath = path.resolve(__dirname, FILENAME_FOOTER);
 		try {
 			var fd = fs.openSync(footerPath, "r");
 		} catch (e) {
