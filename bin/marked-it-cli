@@ -44,6 +44,7 @@ var OPTION_CONREFFILE = "--conref-file";
 var SWITCH_HELP = "--help";
 
 var DEFAULT_TOC_DEPTH = 3;
+var REGEX_EXTENSION_ARG = /^--@([^:]+):([^$]+)$/
 
 var sourceDir, destDir;
 var overwrite, disableAttributes, disableFrontMatter, genPdf, verbose, debug;
@@ -51,6 +52,7 @@ var headerFile, footerFile, pdfOptionsFile, conrefFile;
 var extensionFiles = [];
 var tocJSON, tocXML, tocDepth;
 var help;
+var extensionData = {};
 
 var switchCounter = 0;
 process.argv.forEach(function(arg) {
@@ -90,9 +92,24 @@ process.argv.forEach(function(arg) {
 	} else if (arg.indexOf("-") !== 0) {
 		sourceDir = arg;
 	} else {
-		/* don't display errors for the first two args (the node executable and .js file) */
-		if (switchCounter > 2) {
-			console.log("*** Ignoring unknown command-line switch: " + arg);
+		var match = REGEX_EXTENSION_ARG.exec(arg);
+		if (match) {
+			var extensionId = match[1];
+			extensionData[extensionId] = extensionData[extensionId] || {};
+			var args = match[2].split(",");
+			args.forEach(function(arg) {
+				var index = arg.indexOf("=");
+				if (index === -1) {
+					extensionData[extensionId][arg] = null;
+				} else {
+					extensionData[extensionId][arg.substring(0, index)] = arg.substring(index + 1);
+				}
+			});
+		} else {
+			/* don't display errors for the first two args (the node executable and .js file) */
+			if (switchCounter > 2) {
+				console.log("*** Ignoring unknown command-line switch: " + arg);
+			}
 		}
 	}
 });
@@ -131,7 +148,8 @@ if (help || !sourceDir || !destDir) {
 		tocDepth: tocDepth,
 		headerFile: headerFile,
 		footerFile: footerFile,
-		conrefFile: conrefFile
+		conrefFile: conrefFile,
+		extensionData: extensionData
 	}, logger);
 }
 
