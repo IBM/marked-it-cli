@@ -2,6 +2,9 @@
 
 This project uses [semantic versioning](http://semver.org/).
 
+## [0.19.1] 2019-09-13
+example/accessibilityExt.js: Made generation of table summary text ids deterministic.
+
 ## [0.19.0] 2019-08-23
 Replace reading of extension init data from conref files to reading it from generic command-line args of form `--@<extensionId>:<name>=<value>`.
 

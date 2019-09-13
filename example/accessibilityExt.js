@@ -19,7 +19,10 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+var crypto = require("crypto");
+
 var html = {};
+var usedSummaryIds = {};
 
 var CAPTION = "caption";
 var CAPTION_SIDE = "caption-side";
@@ -60,7 +63,14 @@ function processCaptions(html, data) {
 	delete table.attribs[SUMMARY];
 
 	if (summaryText) {
-		var spanId = "tableSummary-" + Math.floor(Math.random() * Math.floor(100000000));
+		var hash = crypto.createHash("md5").update(html).digest("hex");
+		if (!usedSummaryIds[hash]) {
+			usedSummaryIds[hash] = 1;
+		} else {
+			hash += "-" + usedSummaryIds[hash]++;
+		}
+
+		var spanId = "tableSummary-" + hash;
 		table.attribs["aria-describedby"] = spanId;
 		captionText = "\n" + captionText + "<br>\n<span class='table-summary' id='" + spanId + "'>" + summaryText + "</span>\n";
 	}
