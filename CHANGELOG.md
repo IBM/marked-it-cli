@@ -2,6 +2,9 @@
 
 This project uses [semantic versioning](http://semver.org/).
 
+## [0.20.0] 2019-10-11
+Exposed the core generator's new ability to generate footnotes that follow the syntax described at <https://www.markdownguide.org/extended-syntax/#footnotes>.
+
 ## [0.19.1] 2019-09-13
 example/accessibilityExt.js: Made generation of table summary text ids deterministic.
 
