@@ -28,7 +28,7 @@
 	"dependencies": {
 		"marked-it-core": "~0.14.1",
 		"wkhtmltopdf": "0.1.5",
-		"js-yaml": "3.5.3",
+		"js-yaml": "3.13.1",
 		"htmlparser2": "3.8.3",
 		"js-beautify": "1.6.4",
 		"fs-extra": "1.0.0",
