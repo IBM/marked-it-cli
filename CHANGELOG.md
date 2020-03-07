@@ -2,6 +2,9 @@
 
 This project uses [semantic versioning](http://semver.org/).
 
+## [0.20.3] 2020-03-07
+Picked up the latest marked-it fixes.
+
 ## [0.20.2] 2020-03-07
 Fixed ALD detection regex.
 
