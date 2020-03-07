@@ -2,6 +2,9 @@
 
 This project uses [semantic versioning](http://semver.org/).
 
+## [0.20.2] 2020-03-07
+Fixed ALD detection regex.
+
 ## [0.20.1] 2019-10-11
 Fixed package-lock.json.
 
