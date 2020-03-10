@@ -55,6 +55,9 @@ var tocJSON, tocXML, tocDepth;
 var help;
 var extensionData = {};
 
+var package = require('../package.json');
+console.log(`marked-it-cli v${package.version}\n`)
+
 var switchCounter = 0;
 process.argv.forEach(function(arg) {
 	switchCounter++;
