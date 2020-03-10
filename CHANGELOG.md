@@ -2,6 +2,9 @@
 
 This project uses [semantic versioning](http://semver.org/).
 
+## [0.20.4] 2020-03-09
+Print the version string at startup.
+
 ## [0.20.3] 2020-03-07
 Picked up the latest marked-it fixes.
 
