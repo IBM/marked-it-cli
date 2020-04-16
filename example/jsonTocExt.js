@@ -128,6 +128,7 @@ json.toc.file.onGenerate = function(content, data) {
 	var CLASS_TOPICGROUP = "topicgroup";
 	var ATTRIBUTE_CLASS = "class";
 	var ATTRIBUTE_ID = "id";
+	var ATTRIBUTE_TOPICGROUP_ID = "topicgroup-id";
 
 	var clearNavgroupAtEnd = false;
 
@@ -247,7 +248,11 @@ json.toc.file.onGenerate = function(content, data) {
 					break;
 				}
 				if (current === CLASS_TOPICGROUP) {
-					result = {label: data.source, properties: [{name: "topicgroup", value: data.source}]};
+					var properties = [{name: "topicgroup", value: data.source}];
+					if (data.attributes[ATTRIBUTE_TOPICGROUP_ID]) {
+						properties.push({name: "topicgroup-id", value: data.attributes[ATTRIBUTE_TOPICGROUP_ID]});
+					}
+					result = {label: data.source, properties: properties};
 					break;
 				}
 			}
