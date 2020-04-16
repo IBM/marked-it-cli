@@ -2,6 +2,9 @@
 
 This project uses [semantic versioning](http://semver.org/).
 
+## [0.21.1] 2020-04-16
+Update js-yaml dependency.
+
 ## [0.21.0] 2020-04-16
 Added support for `topicgroup-id` in examples/jsonTocExt.js.
 
