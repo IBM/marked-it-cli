@@ -2,6 +2,9 @@
 
 This project uses [semantic versioning](http://semver.org/).
 
+## [0.22.1] 2020-06-02
+Added example/videoExt.js mime type determination.
+
 ## [0.22.0] 2020-06-02
 Added example/videoExt.js.
 

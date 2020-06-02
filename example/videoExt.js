@@ -26,12 +26,23 @@
   * ![Watson Assistant product overview](https://www.youtube.com/embed/h-u-5f8fZtc?rel=0){: video width="640" height="390"}
   * 
   * Other video:
-  * ![Watson Assistant product overview](video.mp4){: video type="video/mp4" width="640" height="390" controls}
+  * ![Watson Assistant product overview](video.mp4){: video width="640" height="390" controls}
   */
 
 const url = require('url');
 var html = {};
 var logger;
+
+const MIME_TYPES = {
+	"3gp": "video/3gpp",
+	"avi": "video/x-msvideo",
+	"flv": "video/x-flv",
+	"m3u8": "application/x-mpegURL",
+	"mov": "video/quicktime",
+	"mp4": "video/mp4",
+	"ts": "video/MP2T",
+	"wmv": "video/x-ms-wmv"
+}
 
 html.onImage = function(html, data) {
 	var image = data.htmlToDom(html)[0];
@@ -50,8 +61,6 @@ html.onImage = function(html, data) {
 
 	var alt = image.attribs["alt"];
 	delete image.attribs["alt"];
-	var type = image.attribs["type"];
-	delete image.attribs["type"];
 
 	var isYouTube = false; /* default */
 	try {
@@ -80,9 +89,29 @@ html.onImage = function(html, data) {
 	if (alt) {
 		video.attribs["title"] = alt;
 	}
+
+	/*
+	 * Use the provided type if there is one, and otherwise try to determine it based on the extension.
+	 */
+	var type = image.attribs["type"];
+	delete image.attribs["type"];
+	if (!type) {
+		var filename = src; /* default */
+		try {
+			var urlObj = new url.URL(src);
+			filename = urlObj.pathname;
+		} catch (e) {
+			/*
+			 * The src is not an url, so just try it as a filename, which is the default anyways.
+			 */
+		}
+		var extension = filename.substring(filename.lastIndexOf(".") + 1);
+		type = MIME_TYPES[extension];
+	}
 	if (type) {
 		video.children[0].attribs["type"] = type;
 	}
+
 	/* copy any remaining attributes into the <video> as-is */
 	Object.keys(image.attribs).forEach(function(key) {
 		video.attribs[key] = image.attribs[key];
