@@ -2,6 +2,9 @@
 
 This project uses [semantic versioning](http://semver.org/).
 
+## [0.22.0] 2020-06-02
+Added example/videoExt.js.
+
 ## [0.21.2] 2020-05-27
 Update highlight.js dependency.
 
