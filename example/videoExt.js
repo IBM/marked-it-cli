@@ -23,10 +23,10 @@
   * Examples of referencing videos:
   *
   * YouTube video:
-  * ![Watson Assistant product overview](https://www.youtube.com/embed/h-u-5f8fZtc?rel=0){: video width="640" height="390"}
+  * ![Watson Assistant product overview](https://www.youtube.com/embed/h-u-5f8fZtc?rel=0){: .video width="640" height="390"}
   * 
   * Other video:
-  * ![Watson Assistant product overview](video.mp4){: video width="640" height="390" controls}
+  * ![Watson Assistant product overview](video.mp4){: .video width="640" height="390" controls}
   */
 
 const url = require('url');
@@ -46,7 +46,7 @@ const MIME_TYPES = {
 
 html.onImage = function(html, data) {
 	var image = data.htmlToDom(html)[0];
-	if (!image.attribs["video"]) {
+	if (!(image.attribs["video"] || (image.attribs["class"] || "").split(" ").indexOf("video") !== -1)) {
 		return; /* nothing to do */
 	}
 
@@ -56,6 +56,14 @@ html.onImage = function(html, data) {
 		return;
 	}
 
+	if (image.attribs["class"]) {
+		var segments = image.attribs["class"].split(" ");
+		var index = segments.indexOf("video");
+		if (index !== -1) {
+			segments.splice(index, 1);
+			image.attribs["class"] = segments.join(" ");
+		}
+	}
 	delete image.attribs["video"];
 	delete image.attribs["src"];
 

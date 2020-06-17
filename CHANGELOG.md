@@ -2,6 +2,9 @@
 
 This project uses [semantic versioning](http://semver.org/).
 
+## [0.22.2] 2020-06-17
+example/videoExt.js: Act if `video` is present as an attribute or as a class.
+
 ## [0.22.1] 2020-06-02
 Added example/videoExt.js mime type determination.
 
