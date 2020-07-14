@@ -2,6 +2,9 @@
 
 This project uses [semantic versioning](http://semver.org/).
 
+## [0.22.3] 2020-07-13
+example/videoExt.js: Add support for output='iframe'.
+
 ## [0.22.2] 2020-06-17
 example/videoExt.js: Act if `video` is present as an attribute or as a class.
 

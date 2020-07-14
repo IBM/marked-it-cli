@@ -61,7 +61,11 @@ html.onImage = function(html, data) {
 		var index = segments.indexOf("video");
 		if (index !== -1) {
 			segments.splice(index, 1);
-			image.attribs["class"] = segments.join(" ");
+			if (segments.length) {
+				image.attribs["class"] = segments.join(" ");
+			} else {
+				delete image.attribs["class"];
+			}
 		}
 	}
 	delete image.attribs["video"];
@@ -70,18 +74,9 @@ html.onImage = function(html, data) {
 	var alt = image.attribs["alt"];
 	delete image.attribs["alt"];
 
-	var isYouTube = false; /* default */
-	try {
-		var urlObj = new url.URL(src);
-		isYouTube = urlObj.host.toLowerCase().indexOf("youtube") !== -1;
-	} catch (e) {
-		/*
-		 * The src is not an url, which is valid, it could be a relative path.
-		 * Regardless, it's obviously not a YouTube link, so just carry on.
-		 */
-	}
-
-	if (isYouTube) {
+	var output = image.attribs["output"];
+	if (output === "iframe") {
+		delete image.attribs["output"];
 		var frame = data.htmlToDom(`<iframe src="${src}"></iframe>`)[0];
 		if (alt) {
 			frame.attribs["title"] = alt;
