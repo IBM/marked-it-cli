@@ -2,6 +2,9 @@
 
 This project uses [semantic versioning](http://semver.org/).
 
+## [0.22.4] 2020-08-05
+Added mp4 to the list of file types copied from the source to destination.
+
 ## [0.22.3] 2020-07-13
 example/videoExt.js: Add support for output='iframe'.
 
