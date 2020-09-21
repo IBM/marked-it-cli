@@ -2,6 +2,9 @@
 
 This project uses [semantic versioning](http://semver.org/).
 
+## [0.23.0] 2020-09-21
+Added extension point `styling.code.syntax.getAdditionalLanguages`.
+
 ## [0.22.4] 2020-08-05
 Added mp4 to the list of file types copied from the source to destination.
 
