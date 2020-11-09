@@ -2,6 +2,9 @@
 
 This project uses [semantic versioning](http://semver.org/).
 
+## [0.24.0] 2020-11-09
+Stop auto-fixing invalid headers.
+
 ## [0.23.0] 2020-09-21
 Added extension point `styling.code.syntax.getAdditionalLanguages`.
 
