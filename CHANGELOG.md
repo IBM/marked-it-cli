@@ -2,6 +2,9 @@
 
 This project uses [semantic versioning](http://semver.org/).
 
+## [0.24.1] 2020-12-02
+Update the highlight.js dependency.
+
 ## [0.24.0] 2020-11-09
 Stop auto-fixing invalid headers.
 
