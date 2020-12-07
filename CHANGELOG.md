@@ -2,6 +2,9 @@
 
 This project uses [semantic versioning](http://semver.org/).
 
+## [0.24.2] 2020-12-07
+Update the highlight.js dependency.
+
 ## [0.24.1] 2020-12-02
 Update the highlight.js dependency.
 
