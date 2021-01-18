@@ -2,6 +2,9 @@
 
 This project uses [semantic versioning](http://semver.org/).
 
+## [0.24.3] 2021-01-18
+Update example/jsonTocExt.js.
+
 ## [0.24.2] 2020-12-07
 Update the highlight.js dependency.
 

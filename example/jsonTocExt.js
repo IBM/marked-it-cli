@@ -78,6 +78,13 @@ json.toc.onTopic = function(topic, data) {
 		changed = true;
 	}
 
+	if (heading.name === "h1") {
+		if (data.frontMatterMap.lastupdated) {
+			topicDom.lastupdated = data.frontMatterMap.lastupdated;
+			changed = true;
+		}
+	}
+
 	return changed ? JSON.stringify(topicDom) : undefined;
 };
 
