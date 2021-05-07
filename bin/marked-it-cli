@@ -22,43 +22,43 @@
  */
 
 /*eslint-env node */
-var mdProcessor = require("../lib/mdProcessor");
+const mdProcessor = require("../lib/mdProcessor");
 var logger = require("../lib/logger");
 
-var ARG_SOURCEDIR = "--sourceDir";
-var ARG_OUTPUT = "--output";
-var SWITCH_OVERWRITE = "--overwrite";
-var SWITCH_ATTRIBUTES = "--disable-attributes";
-var SWITCH_FOOTNOTES = "--disable-footnotes";
-var SWITCH_FRONTMATTER = "--disable-front-matter";
-var SWITCH_PDF = "--gen-pdf";
-var SWITCH_VERBOSE = "--verbose";
-var SWITCH_DEBUG = "--debug";
-var SWITCH_TOCXML = "--toc-xml";
-var SWITCH_TOCJSON = "--toc-json";
-var OPTION_TOC_DEPTH = "--toc-depth";
-var OPTION_PDFOPTIONSFILE = "--pdf-options-file";
-var OPTION_EXTENSIONFILE = "--extension-file";
-var OPTION_HEADERFILE = "--header-file";
-var OPTION_FOOTERFILE = "--footer-file";
-var OPTION_CONREFFILE = "--conref-file";
-var SWITCH_HELP = "--help";
+const ARG_SOURCEDIR = "--sourceDir";
+const ARG_OUTPUT = "--output";
+const SWITCH_OVERWRITE = "--overwrite";
+const SWITCH_ATTRIBUTES = "--disable-attributes";
+const SWITCH_FOOTNOTES = "--disable-footnotes";
+const SWITCH_FRONTMATTER = "--disable-front-matter";
+const SWITCH_PDF = "--gen-pdf";
+const SWITCH_VERBOSE = "--verbose";
+const SWITCH_DEBUG = "--debug";
+const SWITCH_TOCXML = "--toc-xml";
+const SWITCH_TOCJSON = "--toc-json";
+const OPTION_TOC_DEPTH = "--toc-depth";
+const OPTION_PDFOPTIONSFILE = "--pdf-options-file";
+const OPTION_EXTENSIONFILE = "--extension-file";
+const OPTION_HEADERFILE = "--header-file";
+const OPTION_FOOTERFILE = "--footer-file";
+const OPTION_CONREFFILE = "--conref-file";
+const SWITCH_HELP = "--help";
 
-var DEFAULT_TOC_DEPTH = 3;
-var REGEX_EXTENSION_ARG = /^--@([^:]+):([^$]+)$/
+const DEFAULT_TOC_DEPTH = 3;
+const REGEX_EXTENSION_ARG = /^--@([^:]+):([^$]+)$/
 
-var sourceDir, destDir;
-var overwrite, disableAttributes, disableFootnotes, disableFrontMatter, genPdf, verbose, debug;
-var headerFile, footerFile, pdfOptionsFile, conrefFile;
-var extensionFiles = [];
-var tocJSON, tocXML, tocDepth;
-var help;
-var extensionData = {};
+let sourceDir, destDir;
+let overwrite, disableAttributes, disableFootnotes, disableFrontMatter, genPdf, verbose, debug;
+let headerFile, footerFile, pdfOptionsFile, conrefFile;
+const extensionFiles = [];
+let tocJSON, tocXML, tocDepth;
+let help;
+const extensionData = {};
 
-var package = require('../package.json');
+const package = require('../package.json');
 console.log(`marked-it-cli v${package.version}\n`)
 
-var switchCounter = 0;
+let switchCounter = 0;
 process.argv.forEach(function (arg) {
   switchCounter++;
   if (arg.indexOf(ARG_OUTPUT) === 0 && arg.indexOf("=") !== -1) {
@@ -98,13 +98,13 @@ process.argv.forEach(function (arg) {
   } else if (arg.indexOf("-") !== 0) {
     sourceDir = arg;
   } else {
-    var match = REGEX_EXTENSION_ARG.exec(arg);
+    const match = REGEX_EXTENSION_ARG.exec(arg);
     if (match) {
-      var extensionId = match[1];
+      const extensionId = match[1];
       extensionData[extensionId] = extensionData[extensionId] || {};
-      var args = match[2].split(",");
+      const args = match[2].split(",");
       args.forEach(function (arg) {
-        var index = arg.indexOf("=");
+        const index = arg.indexOf("=");
         if (index === -1) {
           extensionData[extensionId][arg] = null;
         } else {
@@ -123,19 +123,19 @@ process.argv.forEach(function (arg) {
 if (help || !sourceDir || !destDir) {
   outputHelpPage();
 } else {
-  var loggerLevel = logger.WARNING;
+  let loggerLevel = logger.WARNING;
   if (verbose) {
     loggerLevel = logger.INFO;
   }
   if (debug) {
     loggerLevel = logger.DEBUG;
   }
-  var logger = new logger.Logger(loggerLevel);
+  const loggerInstance = new logger.Logger(loggerLevel);
 
   tocDepth = parseInt(tocDepth || DEFAULT_TOC_DEPTH);
   if (isNaN(tocDepth) || tocDepth < 0) {
     tocDepth = DEFAULT_TOC_DEPTH;
-    logger.warning("Invalid " + OPTION_TOC_DEPTH + " value, using default value of " + DEFAULT_TOC_DEPTH + ".");
+    loggerInstance.warning("Invalid " + OPTION_TOC_DEPTH + " value, using default value of " + DEFAULT_TOC_DEPTH + ".");
   }
 
   console.log("\nProcessing source directory: " + sourceDir + "...\n");
@@ -157,7 +157,7 @@ if (help || !sourceDir || !destDir) {
     footerFile: footerFile,
     conrefFile: conrefFile,
     extensionData: extensionData
-  }, logger);
+  }, loggerInstance);
 }
 
 function outputHelpPage() {
