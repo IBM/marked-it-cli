@@ -23,7 +23,7 @@
 
 /*eslint-env node */
 const mdProcessor = require("../lib/mdProcessor");
-var logger = require("../lib/logger");
+const logger = require("../lib/logger");
 
 const ARG_SOURCEDIR = "--sourceDir";
 const ARG_OUTPUT = "--output";
