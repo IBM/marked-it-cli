@@ -2,6 +2,9 @@
 
 This project uses [semantic versioning](http://semver.org/).
 
+## [0.25.0] 2021-06-24
+Add support for YAML-formatted toc files.
+
 ## [0.24.3] 2021-01-18
 Update example/jsonTocExt.js.
 
