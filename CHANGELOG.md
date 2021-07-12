@@ -2,6 +2,9 @@
 
 This project uses [semantic versioning](http://semver.org/).
 
+## [0.25.1] 2021-07-12
+Reference newer marked-it dependency.
+
 ## [0.25.0] 2021-06-24
 Add support for YAML-formatted toc files.
 
