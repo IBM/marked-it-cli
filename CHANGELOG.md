@@ -2,6 +2,9 @@
 
 This project uses [semantic versioning](http://semver.org/).
 
+## [0.25.2] 2021-07-16
+Code block syntax styling updates.
+
 ## [0.25.1] 2021-07-12
 Reference newer marked-it dependency.
 
