@@ -2,6 +2,9 @@
 
 This project uses [semantic versioning](http://semver.org/).
 
+## [0.25.7] 2021-07-27
+Fixed TOC generation problem and version detection when using toc.yaml.
+
 ## [0.25.6] 2021-07-23
 Pick up the latest marked-it-core.
 
