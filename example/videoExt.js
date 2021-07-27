@@ -46,7 +46,7 @@ const MIME_TYPES = {
 
 html.onImage = function(html, data) {
 	var image = data.htmlToDom(html)[0];
-	if (!(image.attribs["video"] || (image.attribs["class"] || "").split(" ").indexOf("video") !== -1)) {
+	if (!(image.attribs["video"] !== undefined || (image.attribs["class"] || "").split(" ").indexOf("video") !== -1)) {
 		return; /* nothing to do */
 	}
 
