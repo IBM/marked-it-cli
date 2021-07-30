@@ -20,13 +20,10 @@
  */
 
  /*
-  * Examples of referencing audios:
-  *
-  * YouTube audio:
-  * ![Watson Assistant product overview](https://www.youtube.com/embed/h-u-5f8fZtc?rel=0){: .audio width="640" height="390"}
+  * Example of referencing audio:
   * 
   * Other audio:
-  * ![Watson Assistant product overview](audio.mp4){: .audio width="640" height="390" controls}
+  * ![Testing audio extension](example/audio.mp3){: audio controls loop muted preload type="audio/ogg"}
   */
 
 const url = require('url');
