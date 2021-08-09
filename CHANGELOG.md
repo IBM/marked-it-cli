@@ -2,6 +2,9 @@
 
 This project uses [semantic versioning](http://semver.org/).
 
+## [0.26.0] 2021-08-09
+Added the ability to override TOC title with a `navtitle` attribute in toc.yaml.
+
 ## [0.25.7] 2021-07-27
 Fixed TOC generation problem and version detection when using toc.yaml.
 
