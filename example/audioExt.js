@@ -31,22 +31,21 @@ var html = {};
 var logger;
 
 const MIME_TYPES = {
+	"mp3": "audio/mpeg",
+    "ogg": "audio/ogg",
+	"wav": "audio/wav",
+	"webm": "audio/webm",
 	"au": "audio/basic",
     "snd": "audio/basic",
-    "Linear PCM": "audio/basic",
     "mid": "audio/mid",
     "rmi": "audio/mid",
-    "mp3": "audio/mpeg",
-    "mp4 audio": "audio/mp4",
+    "mp4": "audio/mp4",
     "aif": "audio/x-aiff",
     "aifc": "audio/x-aiff",
     "aiff": "audio/x-aiff",
     "m3u": "audio/x-mpegurl",
     "ra": "audio/vnd.rn-realaudio",
     "ram": "audio/vnd.rn-realaudio",
-    "Ogg Vorbis": "audio/ogg",
-    "Vorbis": "audio/vorbis",
-	"wav": "audio/vnd.wav",
 }
 
 html.onImage = function(html, data) {
