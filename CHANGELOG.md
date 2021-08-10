@@ -2,6 +2,9 @@
 
 This project uses [semantic versioning](http://semver.org/).
 
+## [0.26.1] 2021-08-10
+Pick up the latest marked-it-core.
+
 ## [0.26.0] 2021-08-09
 Added the ability to override TOC title with a `navtitle` attribute in toc.yaml.
 
