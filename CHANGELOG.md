@@ -2,6 +2,9 @@
 
 This project uses [semantic versioning](http://semver.org/).
 
+## [0.28.0] 2021-08-23
+Add support for updated toc.yaml schema.
+
 ## [0.27.0] 2021-08-18
 Turn on the markdown-it typographer.
 
