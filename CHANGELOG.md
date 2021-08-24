@@ -2,6 +2,9 @@
 
 This project uses [semantic versioning](http://semver.org/).
 
+## [0.28.1] 2021-08-24
+Allow links without topics in toc.yaml files.
+
 ## [0.28.0] 2021-08-23
 Add support for updated toc.yaml schema.
 
