@@ -2,6 +2,9 @@
 
 This project uses [semantic versioning](http://semver.org/).
 
+## [0.29.1] 2021-09-15
+Fix parsing of conref files containing code blocks and pick up the latest marked-it-core.
+
 ## [0.29.0] 2021-09-09
 Added support for reading conref markdown content from a root-level conref.md file (v2 only).
 
