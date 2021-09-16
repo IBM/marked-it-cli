@@ -2,6 +2,9 @@
 
 This project uses [semantic versioning](http://semver.org/).
 
+## [0.29.3] 2021-09-16
+Fix parsing of conref files in absence of conkeyref file.
+
 ## [0.29.1 and 0.29.2] 2021-09-15
 Fix parsing of conref files containing code blocks and pick up the latest marked-it-core.
 
