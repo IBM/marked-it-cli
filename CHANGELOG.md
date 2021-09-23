@@ -2,6 +2,9 @@
 
 This project uses [semantic versioning](http://semver.org/).
 
+## [0.29.6] 2021-09-23
+Pick up the latest marked-it-core.
+
 ## [0.29.5] 2021-09-22
 Fix detection of code block bounds, and pick up the latest marked-it-core.
 
