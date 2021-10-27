@@ -2,6 +2,9 @@
 
 This project uses [semantic versioning](http://semver.org/).
 
+## [0.29.10] 2021-10-27
+Rename conkeyref to keyref throughout.
+
 ## [0.29.9] 2021-10-05
 Pick up the latest marked-it-core.
 
