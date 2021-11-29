@@ -2,6 +2,9 @@
 
 This project uses [semantic versioning](http://semver.org/).
 
+## [0.29.11] 2021-11-29
+Make all id values contained within conrefs unique per consumer, to eliminate duplicated id's across topics.
+
 ## [0.29.10] 2021-10-27
 Rename conkeyref to keyref throughout.
 
