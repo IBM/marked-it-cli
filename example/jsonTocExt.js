@@ -190,7 +190,7 @@ json.toc.file.onGenerate = function(content, data) {
 	var result;
 
 	/* if injecting TOC from a .md file then replace all immediate children with <anchor>s */
-	if (/\.md\s*$/.test(data.source)) {
+	if (!data.isPlaintext && /\.md\s*$/.test(data.source)) {
 		result = {};
 		var obj = {};
 		try {
