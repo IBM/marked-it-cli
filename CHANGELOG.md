@@ -2,6 +2,9 @@
 
 This project uses [semantic versioning](http://semver.org/).
 
+## [0.29.13] 2021-12-01
+Fix bug with TOC processing of labels that look like markdown filenames.
+
 ## [0.29.12] 2021-11-30
 Update generated ids within conrefs to include "-include-".
 
