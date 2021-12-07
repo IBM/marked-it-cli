@@ -2,6 +2,9 @@
 
 This project uses [semantic versioning](http://semver.org/).
 
+## [2.0.0] 2021-12-07
+**Version 2.0**. Makes markdown-it the **default** underlying HTML generator.
+
 ## [0.29.13] 2021-12-01
 Fix bug with TOC processing of labels that look like markdown filenames.
 
