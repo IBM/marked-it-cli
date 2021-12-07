@@ -30,11 +30,6 @@
 	},
 	"dependencies": {
 		"marked-it-core": "2.2.3",
-		"marked-it-core": "2.2.1",
-		"marked-it-core": "2.2.2",
-		"marked-it-core": "2.2.0",
-		"marked-it-core": "2.2.1",
-		"marked-it-core": "2.2.2",
 		"wkhtmltopdf": "0.1.5",
 		"js-yaml": "3.13.1",
 		"htmlparser2": "3.8.3",
