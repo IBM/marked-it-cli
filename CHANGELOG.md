@@ -2,6 +2,9 @@
 
 This project uses [semantic versioning](http://semver.org/).
 
+## [2.0.2] 2022-03-03
+Include topicgroup id values in generated TOC when present.
+
 ## [2.0.1] 2022-02-17
 Pick up the latest marked-it-core and fix package-lock.json.
 
