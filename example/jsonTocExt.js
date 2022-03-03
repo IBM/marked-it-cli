@@ -260,6 +260,9 @@ json.toc.file.onGenerate = function(content, data) {
 						properties.push({name: "topicgroup-id", value: data.attributes[ATTRIBUTE_TOPICGROUP_ID]});
 					}
 					result = {label: data.source, properties: properties};
+					if (data.id) {
+						result.id = data.id;
+					}
 					break;
 				}
 			}
