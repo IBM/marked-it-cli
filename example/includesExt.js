@@ -165,6 +165,65 @@ toc.yaml.get = function (resultObj, data) {
   return resultObj;
 }
 
+const md = {}
+md.onAddVariables = function (mappedFromExtension, data) {
+  const { sourcePath, logger, fileText } = data;
+  const sourceDirPath = path.dirname(sourcePath);
+  // console.log(sourceDirPath);
+  // console.log("******Invoked md.onPreprocess");
+  // console.log(data);
+  // console.log(mappedFromExtension);
+  logger.info("Processing file -> %s", sourcePath);
+
+  // // Regex search for anything between '{{' and '}}'
+  // const re = new RegExp('\{\{.+\.md\}\}', 'g');
+  const re = /\{\{.+\.md\}\}/g;
+  console.log(re);
+  const matches = fileText.match(re);
+  console.log(matches);
+
+  // // Check for valid .md file paths in results
+  if (matches) {
+    matches.forEach(item => {
+      const mdFilePath = item.substring(
+        item.indexOf('{{') + 2,
+        item.lastIndexOf('}}')
+      );
+
+      // console.log(mdFilePath);
+      // Read mdFile and assign the content as key value pair in conrefMap
+      const fullpath_mdFilePath = path.join(sourceDirPath, mdFilePath)
+      let mdStat;
+      let fileContent;
+      
+      try {
+        mdStat = fse.statSync(fullpath_mdFilePath);
+      } catch (e) {
+        // this file is not present, which is fine, just continue
+        logger.warning("No such file found: " + fullpath_mdFilePath);
+      }
+      if (mdStat && mdStat.isFile()) {
+        try {
+          // console.log("Found file...\n");
+          fileContent = fse.readFileSync(fullpath_mdFilePath, 'utf8');
+          // console.log('Successfully read fileContent');
+          // console.log('---->\n' , fileContent, '\n<----');
+          // Update the results
+          // Key is mdFilePath
+          mappedFromExtension[mdFilePath] = fileContent;
+        } catch (e) {
+          /* this file is not present, which is fine, just continue */
+          logger.warning("Error found in " + fullpath_mdFilePath + ":\n" + e);
+        }
+      };
+    });
+  }
+
+  console.log(mappedFromExtension);
+  return mappedFromExtension;
+}
+
 module.exports.init = init;
 module.exports.toc = toc;
+module.exports.md = md;
 module.exports.id = "includes";
