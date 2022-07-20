@@ -100,7 +100,7 @@ function preProcessJson(jsonData, sourcePath) {
 
 // main
 const init = function (initData) {
-  logger = initData.logger;
+  let { sourcePath, logger } = initData;
   logger.info("Started inclueds extension...");
 
   // Read toc.yaml file
