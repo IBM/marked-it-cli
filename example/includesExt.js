@@ -70,7 +70,7 @@ function parseTopicsRecursive(topics, sourcePath) {
       // Replace include keyword with topic
       // console.log(result);
       topic.include = result.join('/')
-      topic.topic = topic.include;
+      topic.topic = `includes/${topic.include}`;
       delete topic.include;
       // console.log(topic);
       resData.push(topic.topic)
