@@ -125,5 +125,46 @@ const init = function (initData) {
   }
 }
 
+const toc = { yaml: {} };
+// Function to check if intermediate toc file is generated after include processing and return yamlToc
+toc.yaml.get = function (resultObj, data) {
+  const sourcePath = data.sourcePath;
+  logger = data.logger;
+
+  let yamlToc;
+  let yamlTocOrderPath;
+
+  const outputFilename = FILENAME_INCLUDES_GEN_TOC_ORDER_YAML;
+  const path_outputFilename = path.join(sourcePath, outputFilename)
+  let yamlStat;
+  try {
+    yamlStat = fse.statSync(path_outputFilename);
+  } catch (e) {
+    // this file is not present, which is fine, just continue
+    logger.warning("No YAML TOC ordering file found: " + path_outputFilename);
+  }
+  if (yamlStat && yamlStat.isFile()) {
+    try {
+      console.log("Found toc_includes_gen file...\n");
+      yamlToc = jsYaml.load(fse.readFileSync(path_outputFilename, 'utf8'));
+      yamlTocOrderPath = path_outputFilename;
+      console.log('Success!, returning yamlToc');
+      console.log(yamlToc);
+      console.log(`yamlTocOrderPath: ${yamlTocOrderPath}`);
+      // Update the results
+      resultObj.yamlToc = yamlToc;
+      resultObj.yamlTocOrderPath = yamlTocOrderPath;
+
+      return resultObj;
+    } catch (e) {
+      /* this file is not present, which is fine, just continue */
+      logger.warning("Error found in " + path_outputFilename + ":\n" + e);
+    }
+  }
+  // Return undefined if the file not found
+  return resultObj;
+}
+
 module.exports.init = init;
+module.exports.toc = toc;
 module.exports.id = "includes";
