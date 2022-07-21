@@ -731,18 +731,12 @@ const md = {}
 md.onAddVariables = function (mappedFromExtension, data) {
   const { sourcePath, logger, fileText } = data;
   const sourceDirPath = path.dirname(sourcePath);
-  // console.log(sourceDirPath);
-  // console.log("******Invoked md.onPreprocess");
-  // console.log(data);
-  // console.log(mappedFromExtension);
-  logger.info("Processing file -> %s", sourcePath);
+  logger.info("Processing file " + sourcePath);
 
   // // Regex search for anything between '{{' and '}}'
   // const re = new RegExp('\{\{.+\.md\}\}', 'g');
   const re = /\{\{.+\.md\}\}/g;
-  console.log(re);
   const matches = fileText.match(re);
-  console.log(matches);
 
   // // Check for valid .md file paths in results
   if (matches) {
@@ -752,7 +746,6 @@ md.onAddVariables = function (mappedFromExtension, data) {
         item.lastIndexOf('}}')
       );
 
-      // console.log(mdFilePath);
       // Read mdFile and assign the content as key value pair in conrefMap
       const fullpath_mdFilePath = path.join(sourceDirPath, mdFilePath)
       let mdStat;
@@ -766,10 +759,7 @@ md.onAddVariables = function (mappedFromExtension, data) {
       }
       if (mdStat && mdStat.isFile()) {
         try {
-          // console.log("Found file...\n");
           fileContent = fse.readFileSync(fullpath_mdFilePath, 'utf8');
-          // console.log('Successfully read fileContent');
-          // console.log('---->\n' , fileContent, '\n<----');
           // Update the results
           // Key is mdFilePath
           mappedFromExtension[mdFilePath] = fileContent;
@@ -781,7 +771,6 @@ md.onAddVariables = function (mappedFromExtension, data) {
     });
   }
 
-  console.log(mappedFromExtension);
   return mappedFromExtension;
 }
 
