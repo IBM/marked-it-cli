@@ -2,6 +2,10 @@
 
 This project uses [semantic versioning](http://semver.org/).
 
+## [2.1.0] 2022-07-21
+- Add support for include feature in toc.yaml
+- Add support for file include in .md files
+
 ## [2.0.2] 2022-03-03
 Include topicgroup id values in generated TOC when present.
 
