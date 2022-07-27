@@ -727,18 +727,18 @@ file.dir.files.get =  function (filenames, data){
   return filenames;
 }
 
-const md = {}
-md.onAddVariables = function (mappedFromExtension, data) {
-  const { sourcePath, logger, fileText } = data;
+const md = {variables: {}}
+md.variables.add = function (obj, data) {
+  const { sourcePath, fileText } = data;
   const sourceDirPath = path.dirname(sourcePath);
   logger.info("Processing file " + sourcePath);
 
-  // // Regex search for anything between '{{' and '}}'
+  // Regex search for anything between '{{' and '}}'
   // const re = new RegExp('\{\{.+\.md\}\}', 'g');
   const re = /\{\{.+\.md\}\}/g;
   const matches = fileText.match(re);
 
-  // // Check for valid .md file paths in results
+  // Check for valid .md file paths in results
   if (matches) {
     matches.forEach(item => {
       const mdFilePath = item.substring(
@@ -755,23 +755,21 @@ md.onAddVariables = function (mappedFromExtension, data) {
         mdStat = fse.statSync(fullpath_mdFilePath);
       } catch (e) {
         // this file is not present, which is fine, just continue
-        logger.warning("No such file found: " + fullpath_mdFilePath);
       }
       if (mdStat && mdStat.isFile()) {
         try {
           fileContent = fse.readFileSync(fullpath_mdFilePath, 'utf8');
           // Update the results
           // Key is mdFilePath
-          mappedFromExtension[mdFilePath] = fileContent;
+          obj[mdFilePath] = fileContent;
         } catch (e) {
-          /* this file is not present, which is fine, just continue */
-          logger.warning("Error found in " + fullpath_mdFilePath + ":\n" + e);
+          logger.warning("Error occurred reading variable-included file " + mdFilePath + ":\n" + e);
         }
-      };
+      }
     });
   }
 
-  return mappedFromExtension;
+  return obj;
 }
 
 module.exports.init = init;
