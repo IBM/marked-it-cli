@@ -1,7 +1,7 @@
 /**
  * marked-it-cli
  *
- * Copyright (c) 2018 IBM Corporation
+ * Copyright (c) 2022 IBM Corporation
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software
  * and associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -32,7 +32,7 @@ function parseTopicsRecursive(topics, sourcePath) {
     if (typeof topic === 'string') {
       resData.push(topic)
     } else if (topic?.include) {
-      // Moddify the include keyword for further processing
+      // Modify the include keyword for further processing
       let result = topic.include.split('/');
       result.shift();
       const otherRepoRoot = result[0];
@@ -48,7 +48,7 @@ function parseTopicsRecursive(topics, sourcePath) {
       // Copy other-repo to main repo
       const destFilePath = `${destDir}${includedFileName}`;
 
-      // To copy a file, NOTE: fse.copySync does not supprot file to dir copy like cp, syntax is srcFilePath to destFilePath 
+      // To copy a file, NOTE: fse.copySync does not support file to dir copy like cp, syntax is srcFilePath to destFilePath 
       try {
         fse.copySync(srcFilePath, destFilePath);
       } catch (err) {
@@ -84,9 +84,10 @@ function preProcessJson(jsonData, sourcePath) {
 }
 
 // main
-const init = function (initData) {
-  let { sourcePath, logger } = initData;
-  logger.info("Started inclueds extension...");
+const init = function (data) {
+  logger = data.logger;
+  let sourcePath = data.sourcePath;
+  logger.info("Started includes extension...");
 
   // Read toc.yaml file
   try {
@@ -108,11 +109,10 @@ const init = function (initData) {
   }
 }
 
-const toc = { yaml: {} };
+const toc = {};
 // Function to check if intermediate toc file is generated after include processing and return yamlToc
-toc.yaml.get = function (resultObj, data) {
+toc.get = function (obj, data) {
   const sourcePath = data.sourcePath;
-  logger = data.logger;
 
   let yamlToc;
   let yamlTocOrderPath;
@@ -124,38 +124,29 @@ toc.yaml.get = function (resultObj, data) {
     yamlStat = fse.statSync(path_outputFilename);
   } catch (e) {
     // this file is not present, which is fine, just continue
-    logger.warning("No YAML TOC ordering file found: " + path_outputFilename);
   }
   if (yamlStat && yamlStat.isFile()) {
     try {
-      yamlToc = jsYaml.load(fse.readFileSync(path_outputFilename, 'utf8'));
-      yamlTocOrderPath = path_outputFilename;
-      // Update the results
-      resultObj.yamlToc = yamlToc;
-      resultObj.yamlTocOrderPath = yamlTocOrderPath;
-
-      return resultObj;
+      return jsYaml.load(fse.readFileSync(path_outputFilename, 'utf8'));
     } catch (e) {
-      /* this file is not present, which is fine, just continue */
       logger.warning("Error found in " + path_outputFilename + ":\n" + e);
     }
   }
-  // Return undefined if the file not found
-  return resultObj;
+  return null;
 }
 
-const md = {}
-md.onAddVariables = function (mappedFromExtension, data) {
-  const { sourcePath, logger, fileText } = data;
+const md = {variables: {}}
+md.variables.add = function (obj, data) {
+  const { sourcePath, fileText } = data;
   const sourceDirPath = path.dirname(sourcePath);
   logger.info("Processing file " + sourcePath);
 
-  // // Regex search for anything between '{{' and '}}'
+  // Regex search for anything between '{{' and '}}'
   // const re = new RegExp('\{\{.+\.md\}\}', 'g');
   const re = /\{\{.+\.md\}\}/g;
   const matches = fileText.match(re);
 
-  // // Check for valid .md file paths in results
+  // Check for valid .md file paths in results
   if (matches) {
     matches.forEach(item => {
       const mdFilePath = item.substring(
@@ -172,23 +163,21 @@ md.onAddVariables = function (mappedFromExtension, data) {
         mdStat = fse.statSync(fullpath_mdFilePath);
       } catch (e) {
         // this file is not present, which is fine, just continue
-        logger.warning("No such file found: " + fullpath_mdFilePath);
       }
       if (mdStat && mdStat.isFile()) {
         try {
           fileContent = fse.readFileSync(fullpath_mdFilePath, 'utf8');
           // Update the results
           // Key is mdFilePath
-          mappedFromExtension[mdFilePath] = fileContent;
+          obj[mdFilePath] = fileContent;
         } catch (e) {
-          /* this file is not present, which is fine, just continue */
-          logger.warning("Error found in " + fullpath_mdFilePath + ":\n" + e);
+          logger.warning("Error occurred reading variable-included file " + mdFilePath + ":\n" + e);
         }
-      };
+      }
     });
   }
 
-  return mappedFromExtension;
+  return obj;
 }
 
 module.exports.init = init;
