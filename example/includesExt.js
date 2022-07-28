@@ -135,9 +135,9 @@ toc.get = function (obj, data) {
   return null;
 }
 
-const md = {variables: {}}
+const md = { variables: {} }
 md.variables.add = function (obj, data) {
-  const { sourcePath, fileText } = data;
+  const { sourcePath, fileText, parseConrefs } = data;
   const sourceDirPath = path.dirname(sourcePath);
   logger.info("Processing file " + sourcePath);
 
@@ -145,6 +145,10 @@ md.variables.add = function (obj, data) {
   // const re = new RegExp('\{\{.+\.md\}\}', 'g');
   const re = /\{\{.+\.md\}\}/g;
   const matches = fileText.match(re);
+
+  // Regex search for section ids
+  const re_sections = /\{\{.+\.md#.+\}\}/g;
+  const matches_section = fileText.match(re_sections);
 
   // Check for valid .md file paths in results
   if (matches) {
@@ -158,7 +162,7 @@ md.variables.add = function (obj, data) {
       const fullpath_mdFilePath = path.join(sourceDirPath, mdFilePath)
       let mdStat;
       let fileContent;
-      
+
       try {
         mdStat = fse.statSync(fullpath_mdFilePath);
       } catch (e) {
@@ -177,6 +181,42 @@ md.variables.add = function (obj, data) {
     });
   }
 
+  // Check for sections in .md files
+  if (matches_section) {
+    matches_section.forEach(item => {
+      const fullSectionId = item.substring(
+        item.indexOf('{{') + 2,
+        item.lastIndexOf('}}')
+      );
+
+      // Split file name and section Id(separator '#')
+      const result = fullSectionId.split('#');
+      const mdFilePath = result[0];
+      const sectionId = result[1];
+
+      // Read mdFile and assign the content as key value pair in conrefMap
+      const fullpath_mdFilePath = path.join(sourceDirPath, mdFilePath)
+      let mdStat;
+      let fileContent;
+
+      try {
+        mdStat = fse.statSync(fullpath_mdFilePath);
+      } catch (e) {
+        // this file is not present, which is fine, just continue
+      }
+      if (mdStat && mdStat.isFile()) {
+        try {
+          fileContent = fse.readFileSync(fullpath_mdFilePath, 'utf8');
+          // Update the results
+          let parsedSections = parseConrefs(fileContent, true).site.data.content;
+          // Key is fullSectionId, that will be used in obj for further processing in conrefs
+          obj[fullSectionId] = parsedSections[sectionId];
+        } catch (e) {
+          logger.warning("Error occurred reading variable-included file " + mdFilePath + ":\n" + e);
+        }
+      }
+    });
+  }
   return obj;
 }
 
