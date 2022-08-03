@@ -28,35 +28,43 @@ const FILENAME_INCLUDES_GEN_TOC_ORDER_YAML = "toc_includes_gen.yaml"
 
 function parseTopicsRecursive(topics, sourcePath) {
   let resData = [];
+  // ^ -> beginning
+  // \W -> Matches any character that is not a word character (alphanumeric & underscore). Equivalent to [^A-Za-z0-9_]
+  const re = /^\W+/;
   for (const topic of topics) {
     if (typeof topic === 'string') {
       resData.push(topic)
     } else if (topic?.include) {
       // Modify the include keyword for further processing
-      let result = topic.include.split('/');
-      result.shift();
-      const otherRepoRoot = result[0];
       // Create otherRepoRoot in main-repo
-      const srcFilePath = `${sourcePath}/${topic.include}`;
-      const destDir = `${sourcePath}/includes/${otherRepoRoot}/`;
-      // Create otherRepoRoot to store included files later
-      fse.mkdirpSync(destDir);
+      let includeTopic = topic.include;
+      const srcFilePath = path.resolve(sourcePath, includeTopic);
+      // remove initial non alphanumeric characters like '../' and './' from file path
+      const destRelativePath = includeTopic.replace(re, '');
 
-      // TODO: confirm: can included files be inside nested subfolders?
-      const includedFileName = result[1];
+      // Get file name and dir path
+      const baseDirName = path.dirname(destRelativePath);
+      const baseFileName = path.basename(destRelativePath);
 
+      const destDir = path.resolve(sourcePath, 'includes', baseDirName);
+      // Create directory structure for other-repo to get copied in
+      try {
+        fse.ensureDirSync(destDir);
+      } catch (err) {
+        logger.info(err)
+      }
       // Copy other-repo to main repo
-      const destFilePath = `${destDir}${includedFileName}`;
-
+      const destFilePath = path.resolve(destDir, baseFileName);
       // To copy a file, NOTE: fse.copySync does not support file to dir copy like cp, syntax is srcFilePath to destFilePath 
       try {
         fse.copySync(srcFilePath, destFilePath);
       } catch (err) {
-        console.error(err)
+        // this file is not present, which is fine, just continue after displaying error
+        logger.info(err)
       }
 
       // Replace include keyword with topic
-      topic.include = result.join('/')
+      topic.include = destRelativePath;
       topic.topic = `includes/${topic.include}`;
       delete topic.include;
       resData.push(topic.topic)
