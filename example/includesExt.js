@@ -729,7 +729,7 @@ file.dir.files.get =  function (filenames, data){
 
 const md = {variables: {}}
 md.variables.add = function (obj, data) {
-  const { sourcePath, fileText, parseConrefs } = data;
+  const { sourcePath, fileText, parseMarkdownSections } = data;
   const sourceDirPath = path.dirname(sourcePath);
   logger.info("Processing file " + sourcePath);
 
@@ -800,7 +800,7 @@ md.variables.add = function (obj, data) {
         try {
           fileContent = fse.readFileSync(fullpath_mdFilePath, 'utf8');
           // Update the results
-          let parsedSections = parseConrefs(fileContent, true).site.data.content;
+          let parsedSections = parseMarkdownSections(fileContent, true);
           // Key is fullSectionId, that will be used in obj for further processing in conrefs
           obj[fullSectionId] = parsedSections[sectionId];
         } catch (e) {
