@@ -26,6 +26,41 @@ const jsYaml = require("js-yaml");
 let logger;
 const FILENAME_INCLUDES_GEN_TOC_ORDER_YAML = "toc_includes_gen.yaml"
 
+// Read the srcFile and check for other file references(such as images/videos)
+function copyImageLinkFiles(srcFilePath, destDir) {
+  logger.info(`Searching for img/video links to copy for file: ${srcFilePath}`)
+  const srcFileDir = path.dirname(srcFilePath);
+  // regex for syntax -> ![Image Link description](<image Link>)
+  const img_re = /!\[[^\]]*\]\([^\)]*\)/g;
+
+  try {
+    let fileContent = fse.readFileSync(srcFilePath, "utf8");
+
+    const match_image_links = fileContent.match(img_re);
+    // Check if match_image_links is not falsy (null/undefined)
+    if(match_image_links) {
+      match_image_links.forEach(item => {
+        // Extract img_filepath using substring method
+        const img_filepath = item.substring(
+          item.indexOf('(') + 1,
+          item.lastIndexOf(')'));
+        try {
+          let src = `${srcFileDir}/${img_filepath}`;
+          let dest = `${destDir}/${img_filepath}`;
+          fse.copySync(src, dest);
+        } catch (err) {
+          logger.info(err)
+        }
+      });
+    } else {
+      logger.info(`No img/video links to copy for file: ${srcFilePath}`);
+    }
+  } catch (error) {
+    // Throw error if not able to read the file
+    logger.info(err);
+  }
+}
+
 function parseTopicsRecursive(topics, sourcePath) {
   let resData = [];
   // ^ -> beginning
@@ -58,6 +93,8 @@ function parseTopicsRecursive(topics, sourcePath) {
       // To copy a file, NOTE: fse.copySync does not support file to dir copy like cp, syntax is srcFilePath to destFilePath 
       try {
         fse.copySync(srcFilePath, destFilePath);
+        // Call function to check for other file references(such as images/videos)
+        copyImageLinkFiles(srcFilePath, destDir);
       } catch (err) {
         // this file is not present, which is fine, just continue after displaying error
         logger.info(err)
