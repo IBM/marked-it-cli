@@ -2,6 +2,9 @@
 
 This project uses [semantic versioning](http://semver.org/).
 
+## [2.1.0] 2022-07-27
+Add `md.variables.add` and `toc.get` extension points.
+
 ## [2.0.2] 2022-03-03
 Include topicgroup id values in generated TOC when present.
 
