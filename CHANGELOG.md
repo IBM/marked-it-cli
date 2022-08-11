@@ -2,7 +2,10 @@
 
 This project uses [semantic versioning](http://semver.org/).
 
-## [2.1.0] 2022-07-27
+## [2.1.1] 2022-08-11
+Fix toc generation exception.
+
+## [2.1.0] 2022-08-10
 Add `md.variables.add` and `toc.get` extension points.
 
 ## [2.0.2] 2022-03-03
