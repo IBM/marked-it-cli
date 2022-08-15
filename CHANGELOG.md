@@ -2,6 +2,9 @@
 
 This project uses [semantic versioning](http://semver.org/).
 
+## [2.1.2] 2022-08-15
+Fix replaceVariables() problem.
+
 ## [2.1.1] 2022-08-11
 Fix toc generation exception.
 
