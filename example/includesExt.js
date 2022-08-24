@@ -61,6 +61,66 @@ function copyImageLinkFiles(srcFilePath, destDir) {
   }
 }
 
+function processImageMatch(match, full_mdFilePath, destDir) {
+  // Extract img_filepath using substring method
+  const srcFileDir = path.dirname(full_mdFilePath);
+  const start = match.indexOf('(') + 1;
+  const end = match.lastIndexOf(')');
+  const img_filepath = match.substring(start, end);
+
+  let srcImagePath = path.resolve(`${srcFileDir}/${img_filepath}`);
+  let destImagePath = path.resolve(`${destDir}/${img_filepath}`);
+  let destImageDir = path.dirname(path.resolve(destImagePath));
+
+  try {
+    fse.ensureDirSync(destImageDir);
+    fse.copySync(srcImagePath, destImagePath);
+  } catch (err) {
+    logger.info(err)
+  }
+
+  // Return new relative path for replacement
+  // TODO: Take relative image path from output folder if required
+  const updated_match = match.slice(0, start) + destImagePath + ')';
+  return updated_match;
+}
+
+// Function to process image/video links in md fileContent
+function processImageLinks(fileContent, mdFilePath, full_mdFilePath, inputDir) {
+  // console.log(fileContent);
+  logger.info(`Searching for img/video links in file: ${mdFilePath}`);
+  // ^ -> beginning
+  // \W -> Matches any character that is not a word character (alphanumeric & underscore). Equivalent to [^A-Za-z0-9_]
+  const re = /^\W+/;
+  // Create otherRepoRoot in main-repo
+  // remove initial non alphanumeric characters like '../' and './' from file path
+  const destRelativePath = mdFilePath.replace(re, '');
+
+  // Get file name and dir path
+  const baseDirName = path.dirname(destRelativePath);
+  const baseFileName = path.basename(destRelativePath);
+
+  const destDir = path.resolve(inputDir, 'includes', baseDirName);
+  // Create directory structure for other-repo to get copied in
+  try {
+    fse.ensureDirSync(destDir);
+  } catch (err) {
+    logger.info(err)
+  }
+
+  // regex for syntax -> ![Image Link description](<image Link>)
+  const img_re = /!\[[^\]]*\]\([^\)]*\)/g;
+
+  try {
+    fileContent = fileContent.replace(img_re, match => processImageMatch(match, full_mdFilePath, destDir));
+  } catch (error) {
+    // Throw error if not able to read the file
+    logger.info(error);
+  }
+
+  return fileContent;
+}
+
 function parseTopicsRecursive(topics, sourcePath) {
   let resData = [];
   // ^ -> beginning
@@ -216,9 +276,15 @@ md.variables.add = function (obj, data) {
       if (mdStat && mdStat.isFile()) {
         try {
           fileContent = fse.readFileSync(fullpath_mdFilePath, 'utf8');
+          // Process content for links(image/videos)
+          /* Function requires filecontent(string),
+           and paths(to determine destDir to copy required files in includes/<other-repo-root-dir>),
+           */
+          const modifiedFileContent = processImageLinks(fileContent, mdFilePath, fullpath_mdFilePath, sourceDirPath);
           // Update the results
           // Key is mdFilePath
-          obj[mdFilePath] = fileContent;
+          obj[mdFilePath] = modifiedFileContent;
+
         } catch (e) {
           logger.warning("Error occurred reading variable-included file " + mdFilePath + ":\n" + e);
         }
