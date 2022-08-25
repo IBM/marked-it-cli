@@ -249,47 +249,65 @@ md.variables.add = function (obj, data) {
   // Regex search for anything between '{{' and '}}'
   // const re = new RegExp('\{\{.+\.md\}\}', 'g');
   const re = /\{\{.+\.md\}\}/g;
-  const matches = fileText.match(re);
+  let matches = fileText.match(re);
 
   // Regex search for section ids
   const re_sections = /\{\{.+\.md#.+\}\}/g;
-  const matches_section = fileText.match(re_sections);
+  let matches_section = fileText.match(re_sections);
+
+  function matches_processItem(item, matches_len) {
+    const mdFilePath = item.substring(
+      item.indexOf('{{') + 2,
+      item.lastIndexOf('}}')
+    );
+
+    // Read mdFile and assign the content as key value pair in conrefMap
+    const fullpath_mdFilePath = path.join(sourceDirPath, mdFilePath)
+    let mdStat;
+    let fileContent;
+
+    try {
+      mdStat = fse.statSync(fullpath_mdFilePath);
+    } catch (e) {
+      // this file is not present, which is fine, just continue
+    }
+    if (mdStat && mdStat.isFile()) {
+      try {
+        fileContent = fse.readFileSync(fullpath_mdFilePath, 'utf8');
+        // Process content for links(image/videos)
+        /* Function requires filecontent(string),
+          and paths(to determine destDir to copy required files in includes/<other-repo-root-dir>),
+          */
+        const modifiedFileContent = processImageLinks(fileContent, mdFilePath, fullpath_mdFilePath, sourceDirPath);
+        // Update the results
+        // Key is mdFilePath
+
+        // Check for nested includes if any before writing the content as value
+        let nested_matches = modifiedFileContent.match(re);
+        if(nested_matches) {
+          matches.push(...nested_matches);
+          // Update matches_len
+          matches_len = matches.length;
+        }
+        obj[mdFilePath] = modifiedFileContent;
+
+      } catch (e) {
+        logger.warning("Error occurred reading variable-included file " + mdFilePath + ":\n" + e);
+      }
+    }
+
+    // Return updated matches_len
+    return matches_len;
+  }
 
   // Check for valid .md file paths in results
   if (matches) {
-    matches.forEach(item => {
-      const mdFilePath = item.substring(
-        item.indexOf('{{') + 2,
-        item.lastIndexOf('}}')
-      );
-
-      // Read mdFile and assign the content as key value pair in conrefMap
-      const fullpath_mdFilePath = path.join(sourceDirPath, mdFilePath)
-      let mdStat;
-      let fileContent;
-
-      try {
-        mdStat = fse.statSync(fullpath_mdFilePath);
-      } catch (e) {
-        // this file is not present, which is fine, just continue
-      }
-      if (mdStat && mdStat.isFile()) {
-        try {
-          fileContent = fse.readFileSync(fullpath_mdFilePath, 'utf8');
-          // Process content for links(image/videos)
-          /* Function requires filecontent(string),
-           and paths(to determine destDir to copy required files in includes/<other-repo-root-dir>),
-           */
-          const modifiedFileContent = processImageLinks(fileContent, mdFilePath, fullpath_mdFilePath, sourceDirPath);
-          // Update the results
-          // Key is mdFilePath
-          obj[mdFilePath] = modifiedFileContent;
-
-        } catch (e) {
-          logger.warning("Error occurred reading variable-included file " + mdFilePath + ":\n" + e);
-        }
-      }
-    });
+    let matches_len = matches.length;
+    for(let i=0; i<matches_len; i++){
+      let item = matches[i];
+      // Update matches_len if nested paths are found
+      matches_len = matches_processItem(item, matches_len);
+    }
   }
 
   // Check for sections in .md files
