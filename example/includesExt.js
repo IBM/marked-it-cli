@@ -210,7 +210,7 @@ const init = function (data) {
     // TODO: Cleanup intermediate temp file
     fse.writeFileSync(path_outputFilename, yamlOutput);
   } catch (err) {
-    logger.error(err)
+    logger.info(err)
   }
 }
 
