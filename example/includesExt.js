@@ -41,7 +41,7 @@ function copyImageLinkFiles(srcFilePath, destDir) {
     if(match_image_links) {
       match_image_links.forEach(item => {
         // Extract img_filepath using substring method
-        const img_filepath = item.substring(
+        const img_filepath = item?.substring(
           item.indexOf('(') + 1,
           item.lastIndexOf(')'));
         try {
@@ -66,7 +66,7 @@ function processImageMatch(match, full_mdFilePath, destDir) {
   const srcFileDir = path.dirname(full_mdFilePath);
   const start = match.indexOf('(') + 1;
   const end = match.lastIndexOf(')');
-  const img_filepath = match.substring(start, end);
+  const img_filepath = match?.substring(start, end);
 
   let srcImagePath = path.resolve(`${srcFileDir}/${img_filepath}`);
   let destImagePath = path.resolve(`${destDir}/${img_filepath}`);
@@ -246,17 +246,49 @@ md.variables.add = function (obj, data) {
   const sourceDirPath = path.dirname(sourcePath);
   logger.info("Processing file " + sourcePath);
 
+  // Initialize length for matches and sections
+  let matches_len = 0;
+  let sections_len = 0;
+
+  // NOTE: str.match return null if no match is found, but we can find further matches later during nested case
+  // So either set successful matches or empty array
+
   // Regex search for anything between '{{' and '}}'
   // const re = new RegExp('\{\{.+\.md\}\}', 'g');
   const re = /\{\{.+\.md\}\}/g;
-  let matches = fileText.match(re);
+  let matches = fileText.match(re) || [];
 
   // Regex search for section ids
   const re_sections = /\{\{.+\.md#.+\}\}/g;
-  let matches_section = fileText.match(re_sections);
+  let matches_section = fileText.match(re_sections) || [];
 
-  function matches_processItem(item, matches_len) {
-    const mdFilePath = item.substring(
+  function checkNested(modifiedFileContent, matches_len, sections_len){
+    try {
+      // Check for nested includes if any before writing the content as value
+      let nested_matches = modifiedFileContent.match(re);
+      let nested_sections = modifiedFileContent.match(re_sections);
+
+      if(nested_matches) {
+        // TODO: Ensure unique values in array, and cycle detection?
+        matches.push(...nested_matches);
+        // Update matches_len
+        matches_len = matches.length;
+      }
+      if(nested_sections){
+        // TODO: Ensure unique values in array, and cycle detection?
+        matches_section.push(...nested_sections);
+        // Update matches_len
+        sections_len = matches_section.length;
+      }
+    } catch(err){
+      logger.info(err);
+    }
+
+    return [matches_len, sections_len];
+  }
+
+  function matches_processItem(item, matches_len, sections_len) {
+    const mdFilePath = item?.substring(
       item.indexOf('{{') + 2,
       item.lastIndexOf('}}')
     );
@@ -283,12 +315,9 @@ md.variables.add = function (obj, data) {
         // Key is mdFilePath
 
         // Check for nested includes if any before writing the content as value
-        let nested_matches = modifiedFileContent.match(re);
-        if(nested_matches) {
-          matches.push(...nested_matches);
-          // Update matches_len
-          matches_len = matches.length;
-        }
+        // checkNested(modifiedFileContent, matches_len, sections_len);
+        [matches_len, sections_len] = checkNested(fileContent, matches_len, sections_len);
+
         obj[mdFilePath] = modifiedFileContent;
 
       } catch (e) {
@@ -300,51 +329,70 @@ md.variables.add = function (obj, data) {
     return matches_len;
   }
 
+  function sections_processItem(item, matches_len, sections_len){
+    const fullSectionId = item?.substring(
+      item.indexOf('{{') + 2,
+      item.lastIndexOf('}}')
+    );
+
+    // Split file name and section Id(separator '#')
+    const result = fullSectionId.split('#');
+    const mdFilePath = result[0];
+    const sectionId = result[1];
+
+    // Read mdFile and assign the content as key value pair in conrefMap
+    const fullpath_mdFilePath = path.join(sourceDirPath, mdFilePath)
+    let mdStat;
+    let fileContent;
+
+    try {
+      mdStat = fse.statSync(fullpath_mdFilePath);
+    } catch (e) {
+      // this file is not present, which is fine, just continue
+    }
+    if (mdStat && mdStat.isFile()) {
+      try {
+        fileContent = fse.readFileSync(fullpath_mdFilePath, 'utf8');
+        // TODO: check sections for image links processing
+        // Update the results
+        let parsedSections = parseMarkdownSections(fileContent, true);
+        // Key is fullSectionId, that will be used in obj for further processing in conrefs
+
+        // Check for nested includes(sections) if any before writing the content as value
+        [matches_len, sections_len] = checkNested(fileContent, matches_len, sections_len);
+        
+        obj[fullSectionId] = parsedSections[sectionId];
+      } catch (e) {
+        logger.warning("Error occurred reading variable-included file " + mdFilePath + ":\n" + e);
+      }
+    }
+
+    // Return updated sections_len
+    return sections_len;
+  }
+  
+  // TODO: 
+  // 1. refactor merge common code for matches and sections
+  // 2. for nested case, process for both matches and sections
+
   // Check for valid .md file paths in results
   if (matches) {
-    let matches_len = matches.length;
+    matches_len = matches.length;
     for(let i=0; i<matches_len; i++){
       let item = matches[i];
       // Update matches_len if nested paths are found
-      matches_len = matches_processItem(item, matches_len);
+      matches_len = matches_processItem(item, matches_len, sections_len);
     }
   }
 
   // Check for sections in .md files
   if (matches_section) {
-    matches_section.forEach(item => {
-      const fullSectionId = item.substring(
-        item.indexOf('{{') + 2,
-        item.lastIndexOf('}}')
-      );
-
-      // Split file name and section Id(separator '#')
-      const result = fullSectionId.split('#');
-      const mdFilePath = result[0];
-      const sectionId = result[1];
-
-      // Read mdFile and assign the content as key value pair in conrefMap
-      const fullpath_mdFilePath = path.join(sourceDirPath, mdFilePath)
-      let mdStat;
-      let fileContent;
-
-      try {
-        mdStat = fse.statSync(fullpath_mdFilePath);
-      } catch (e) {
-        // this file is not present, which is fine, just continue
-      }
-      if (mdStat && mdStat.isFile()) {
-        try {
-          fileContent = fse.readFileSync(fullpath_mdFilePath, 'utf8');
-          // Update the results
-          let parsedSections = parseMarkdownSections(fileContent, true);
-          // Key is fullSectionId, that will be used in obj for further processing in conrefs
-          obj[fullSectionId] = parsedSections[sectionId];
-        } catch (e) {
-          logger.warning("Error occurred reading variable-included file " + mdFilePath + ":\n" + e);
-        }
-      }
-    });
+    sections_len = matches_section.length;
+    for(let i=0; i<sections_len; i++){
+      let item = matches_section[i];
+      // Update matches_len if nested paths are found
+      sections_len = sections_processItem(item, matches_len, sections_len);
+    }
   }
   return obj;
 }
