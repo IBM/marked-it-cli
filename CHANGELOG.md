@@ -2,6 +2,9 @@
 
 This project uses [semantic versioning](http://semver.org/).
 
+## [2.1.3] 2022-08-26
+Pick up the latest marked-it-core.
+
 ## [2.1.2] 2022-08-15
 Fix replaceVariables() problem.
 
