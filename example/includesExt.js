@@ -82,7 +82,7 @@ function copyImageLinkFiles(srcFilePath, destDir) {
   }
 }
 
-function processImageMatch(match, full_mdFilePath, destDir) {
+function processImageMatch(match, full_mdFilePath, destDir, inputDir) {
   // Extract img_filepath using substring method
   const srcFileDir = path.dirname(full_mdFilePath);
   const start = match.indexOf('(') + 1;
@@ -102,7 +102,8 @@ function processImageMatch(match, full_mdFilePath, destDir) {
 
   // Return new relative path for replacement
   // TODO: Take relative image path from output folder if required
-  const updated_match = match.slice(0, start) + destImagePath + ')';
+  const relativePath = path.relative(inputDir, destImagePath);
+  const updated_match = match.slice(0, start) + relativePath + ')';
   return updated_match;
 }
 
@@ -133,7 +134,7 @@ function processImageLinks(fileContent, mdFilePath, full_mdFilePath, inputDir) {
   const img_re = /!\[[^\]]*\]\([^\)]*\)/g;
 
   try {
-    fileContent = fileContent.replace(img_re, match => processImageMatch(match, full_mdFilePath, destDir));
+    fileContent = fileContent.replace(img_re, match => processImageMatch(match, full_mdFilePath, destDir, inputDir));
   } catch (error) {
     // Throw error if not able to read the file
     logger.info(error);
