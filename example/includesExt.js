@@ -432,7 +432,6 @@ file.dir.files.get =  function (filenames, data){
   const { currentDir } = data;
   // Ensure 'includes' dir is last entry so it gets processed last
   if(currentDir === sourcePath){
-    console.log(filenames);
     const targetIndex = filenames.indexOf('includes');
     if( targetIndex !== -1){
       // swap with last elemenent
@@ -440,6 +439,14 @@ file.dir.files.get =  function (filenames, data){
       let temp = filenames[lastIndex];
       filenames[lastIndex] = filenames[targetIndex];
       filenames[targetIndex] = temp;
+    } else {
+      // Ensure includes dir, and push to filesnames array
+      try {
+        fse.ensureDir(path.join(sourcePath, 'includes'));
+        filenames.push('includes');
+      } catch (err) {
+        logger.info(err)
+      }
     }
   }
   return filenames;
