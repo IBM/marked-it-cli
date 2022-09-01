@@ -376,13 +376,13 @@ md.variables.add = function (obj, data) {
     if (mdStat && mdStat.isFile()) {
       try {
         fileContent = fse.readFileSync(fullpath_mdFilePath, 'utf8');
-        // TODO: check sections for image links processing
         // Update the results
-        let parsedSections = parseMarkdownSections(fileContent, true);
+        const modifiedFileContent = processImageLinks(fileContent, mdFilePath, fullpath_mdFilePath, sourceDirPath);
+        let parsedSections = parseMarkdownSections(modifiedFileContent, true);
         // Key is fullSectionId, that will be used in obj for further processing in conrefs
 
         // Check for nested includes(sections) if any before writing the content as value
-        [matches_len, sections_len] = checkNested(fileContent, matches_len, sections_len);
+        [matches_len, sections_len] = checkNested(modifiedFileContent, matches_len, sections_len);
         
         obj[fullSectionId] = parsedSections[sectionId];
       } catch (e) {
