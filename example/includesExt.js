@@ -24,6 +24,7 @@ const path = require("path");
 const jsYaml = require("js-yaml");
 
 let logger;
+let sourcePath;
 const FILENAME_INCLUDES_GEN_TOC_ORDER_YAML = "toc_includes_gen.yaml"
 
 const process = {};
@@ -213,7 +214,7 @@ function preProcessJson(jsonData, sourcePath) {
 // main
 const init = function (data) {
   logger = data.logger;
-  let sourcePath = data.sourcePath;
+  sourcePath = data.sourcePath;
   logger.info("Started includes extension...");
 
   // Read toc.yaml file
@@ -419,8 +420,35 @@ md.variables.add = function (obj, data) {
   return obj;
 }
 
+// Function for Dynamic listing of directory structure
+const file = {
+    dir: {
+      files: {},
+    },
+};
+
+file.dir.files.get =  function (filenames, data){
+  // sourcePath is inputDir, populated in init function
+  // currentDir is the directory where generateHTML function is active
+  const { currentDir } = data;
+  // Ensure 'includes' dir is last entry so it gets processed last
+  if(currentDir === sourcePath){
+    console.log(filenames);
+    const targetIndex = filenames.indexOf('includes');
+    if( targetIndex !== -1){
+      // swap with last elemenent
+      let lastIndex =  filenames.length - 1;
+      let temp = filenames[lastIndex];
+      filenames[lastIndex] = filenames[targetIndex];
+      filenames[targetIndex] = temp;
+    }
+  }
+  return filenames;
+}
+
 module.exports.init = init;
 module.exports.toc = toc;
 module.exports.md = md;
 module.exports.id = "includes";
 module.exports.process = process;
+module.exports.file = file;
