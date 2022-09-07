@@ -262,6 +262,51 @@ toc.get = function (obj, data) {
   return null;
 }
 
+// Keyref processing
+function processKeyrefs(fileContent, data) {
+  const { fullpath_mdFilePath } = data;
+
+  // Get file name and dir path
+  const baseDirName = path.dirname(fullpath_mdFilePath);
+  // Check for keyref.yaml and Process if available
+  const FILENAME_KEYREF = 'keyref.yaml';
+  let keyrefPath = path.join(baseDirName, FILENAME_KEYREF);
+
+  let keyStore = {};
+  try {
+    keyStore = Object.assign(keyStore, jsYaml.safeLoad(fse.readFileSync(keyrefPath)));
+  } catch (e) {
+    logger.warning("Failed to parse keyref file: " + keyrefPath + "\n" + e.toString());
+  }
+
+  const re_keyref = /(\{\{)site.data.(.*)(\}\})/g;
+
+  try {
+    fileContent = fileContent.replace(re_keyref, (match, p1, p2, p3) => {
+      let value = match;
+      let key = p2.trim();
+      if (keyStore) {
+        let temp = key.split(".").reduce(
+          function get(result, currentKey) {
+            if (result) { /* result may be null if content is not valid yaml */
+              return result[currentKey];
+            }
+          },
+          keyStore);
+        if (temp) {
+          value = temp;
+        }
+      }
+      return value;
+    });
+  } catch (error) {
+    // Throw error if not able to read the file
+    logger.info(error);
+  }
+
+  return fileContent;
+}
+
 const md = { variables: {} }
 md.variables.add = function (obj, data) {
   const { sourcePath, fileText, parseMarkdownSections } = data;
@@ -328,6 +373,11 @@ md.variables.add = function (obj, data) {
     if (mdStat && mdStat.isFile()) {
       try {
         fileContent = fse.readFileSync(fullpath_mdFilePath, 'utf8');
+        // process Keyrefs
+        fileContent = processKeyrefs(fileContent,
+          { fullpath_mdFilePath }
+        );
+
         // Process content for links(image/videos)
         /* Function requires filecontent(string),
           and paths(to determine destDir to copy required files in includes/<other-repo-root-dir>),
@@ -375,6 +425,10 @@ md.variables.add = function (obj, data) {
     if (mdStat && mdStat.isFile()) {
       try {
         fileContent = fse.readFileSync(fullpath_mdFilePath, 'utf8');
+        // process Keyrefs
+        fileContent = processKeyrefs(fileContent,
+          { fullpath_mdFilePath }
+        );
         // Update the results
         const modifiedFileContent = processImageLinks(fileContent, mdFilePath, fullpath_mdFilePath, sourceDirPath);
         let parsedSections = parseMarkdownSections(modifiedFileContent, true);
