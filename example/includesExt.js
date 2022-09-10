@@ -481,9 +481,9 @@ const file = {
 };
 
 file.dir.files.get =  function (filenames, data){
-  // sourcePath is inputDir, populated in init function
+  // sourcePath is inputDir which is populated in init function, data.sourcePath is currentDir
   // currentDir is the directory where generateHTML function is active
-  const { currentDir } = data;
+  const currentDir = data.sourcePath;
   // Ensure 'includes' dir is last entry so it gets processed last
   if(currentDir === sourcePath){
     const targetIndex = filenames.indexOf('includes');
