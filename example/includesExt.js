@@ -47,12 +47,14 @@ process.onExit = function cleanupTempFiles(obj, data) {
   }
 }
 
-// Read the srcFile and check for other file references(such as images/videos)
+// regex for syntax -> [Link description](<Link>)
+const link_re = /(?:\[[^\]]*\])\(([^\)]*)\)/g;
+
+// Read the srcFile and check for other file references(such as images)
 function copyImageLinkFiles(srcFilePath, destDir) {
-  logger.info(`Searching for img/video links to copy for file: ${srcFilePath}`)
+  logger.info(`Searching for img links to copy for file: ${srcFilePath}`)
   const srcFileDir = path.dirname(srcFilePath);
-  // regex for syntax -> ![Image Link description](<image Link>)
-  const img_re = /!\[[^\]]*\]\([^\)]*\)/g;
+
 
   try {
     let fileContent = fse.readFileSync(srcFilePath, "utf8");
@@ -70,11 +72,11 @@ function copyImageLinkFiles(srcFilePath, destDir) {
           let dest = `${destDir}/${img_filepath}`;
           fse.copySync(src, dest);
         } catch (err) {
-          logger.info(err)
-        }
+        logger.info(err)
+      }
       });
     } else {
-      logger.info(`No img/video links to copy for file: ${srcFilePath}`);
+      logger.info(`No link files to copy for file: ${srcFilePath}`);
     }
   } catch (error) {
     // Throw error if not able to read the file
@@ -107,10 +109,10 @@ function processImageMatch(match, full_mdFilePath, destDir, inputDir) {
   return updated_match;
 }
 
-// Function to process image/video links in md fileContent
+// Function to process image links in md fileContent
 function processImageLinks(fileContent, mdFilePath, full_mdFilePath, inputDir) {
   // console.log(fileContent);
-  logger.info(`Searching for img/video links in file: ${mdFilePath}`);
+  logger.info(`Searching for img links in file: ${mdFilePath}`);
   // ^ -> beginning
   // \W -> Matches any character that is not a word character (alphanumeric & underscore). Equivalent to [^A-Za-z0-9_]
   const re = /^\W+/;
@@ -130,11 +132,8 @@ function processImageLinks(fileContent, mdFilePath, full_mdFilePath, inputDir) {
     logger.info(err)
   }
 
-  // regex for syntax -> ![Image Link description](<image Link>)
-  const img_re = /!\[[^\]]*\]\([^\)]*\)/g;
-
   try {
-    fileContent = fileContent.replace(img_re, match => processImageMatch(match, full_mdFilePath, destDir, inputDir));
+    fileContent = fileContent.replace(link_re, match => processImageMatch(match, full_mdFilePath, destDir, inputDir));
   } catch (error) {
     // Throw error if not able to read the file
     logger.info(error);
@@ -175,7 +174,7 @@ function parseTopicsRecursive(topics, sourcePath) {
       // To copy a file, NOTE: fse.copySync does not support file to dir copy like cp, syntax is srcFilePath to destFilePath 
       try {
         fse.copySync(srcFilePath, destFilePath);
-        // Call function to check for other file references(such as images/videos)
+        // Call function to check for other file references(such as images)
         copyImageLinkFiles(srcFilePath, destDir);
       } catch (err) {
         // this file is not present, which is fine, just continue after displaying error
@@ -378,7 +377,7 @@ md.variables.add = function (obj, data) {
           { fullpath_mdFilePath }
         );
 
-        // Process content for links(image/videos)
+        // Process content for links(image)
         /* Function requires filecontent(string),
           and paths(to determine destDir to copy required files in includes/<other-repo-root-dir>),
           */
