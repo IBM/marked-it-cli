@@ -79,8 +79,8 @@ function copyImageLinkFiles(srcFilePath, destDir) {
           let dest = `${destDir}/${img_filepath}`;
           fse.copySync(src, dest);
         } catch (err) {
-        logger.info(err)
-      }
+          logger.info(err)
+        }
       });
     } else {
       logger.info(`No link files to copy for file: ${srcFilePath}`);
@@ -187,7 +187,7 @@ function parseTopicsRecursive(topics, sourcePath) {
       // To copy a file, NOTE: fse.copySync does not support file to dir copy like cp, syntax is srcFilePath to destFilePath 
       try {
         fse.copySync(srcFilePath, destFilePath);
-        // Call function to check for other file references(such as images)
+        // Call function to check for other file references (such as images)
         copyImageLinkFiles(srcFilePath, destDir);
       } catch (err) {
         // this file is not present, which is fine, just continue after displaying error
