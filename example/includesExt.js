@@ -55,13 +55,20 @@ function copyImageLinkFiles(srcFilePath, destDir) {
   logger.info(`Searching for img links to copy for file: ${srcFilePath}`)
   const srcFileDir = path.dirname(srcFilePath);
 
-
   try {
     let fileContent = fse.readFileSync(srcFilePath, "utf8");
 
-    const match_image_links = fileContent.match(img_re);
+    let match_image_links = [];
+    // Using replace to just run callback fn
+    // If image link push to match_image_links, else Do nothing if link is external link and not a file
+    fileContent.replace(link_re, (match, p1) => {
+      let isUrl = item.startsWith('http');
+      if(!isUrl) {
+        match_image_links.push(p1);
+      }
+    });
     // Check if match_image_links is not falsy (null/undefined)
-    if(match_image_links) {
+    if(match_image_links.length > 0) {
       match_image_links.forEach(item => {
         // Extract img_filepath using substring method
         const img_filepath = item?.substring(
@@ -84,13 +91,20 @@ function copyImageLinkFiles(srcFilePath, destDir) {
   }
 }
 
-function processImageMatch(match, full_mdFilePath, destDir, inputDir) {
+function processImageMatch(match, p1, full_mdFilePath, destDir, inputDir) {
+  let isUrl = p1.startsWith('http');
+  // If is link is external and not a file, do nothing and return
+  if(isUrl) {
+    return match;
+  }
   // Extract img_filepath using substring method
   const srcFileDir = path.dirname(full_mdFilePath);
-  const start = match.indexOf('(') + 1;
-  const end = match.lastIndexOf(')');
-  const img_filepath = match?.substring(start, end);
 
+  // const start = match.indexOf('(') + 1;
+  const start = match.indexOf(p1);
+  // const end = match.lastIndexOf(')');
+  // const img_filepath = match?.substring(start, end);
+  const img_filepath = p1;
   let srcImagePath = path.resolve(`${srcFileDir}/${img_filepath}`);
   let destImagePath = path.resolve(`${destDir}/${img_filepath}`);
   let destImageDir = path.dirname(path.resolve(destImagePath));
@@ -103,7 +117,6 @@ function processImageMatch(match, full_mdFilePath, destDir, inputDir) {
   }
 
   // Return new relative path for replacement
-  // TODO: Take relative image path from output folder if required
   const relativePath = path.relative(inputDir, destImagePath);
   const updated_match = match.slice(0, start) + relativePath + ')';
   return updated_match;
@@ -133,7 +146,7 @@ function processImageLinks(fileContent, mdFilePath, full_mdFilePath, inputDir) {
   }
 
   try {
-    fileContent = fileContent.replace(link_re, match => processImageMatch(match, full_mdFilePath, destDir, inputDir));
+    fileContent = fileContent.replace(link_re, (match, p1) => processImageMatch(match, p1, full_mdFilePath, destDir, inputDir));
   } catch (error) {
     // Throw error if not able to read the file
     logger.info(error);
