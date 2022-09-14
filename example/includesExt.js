@@ -26,6 +26,8 @@ const jsYaml = require("js-yaml");
 let logger;
 let sourcePath;
 const FILENAME_INCLUDES_GEN_TOC_ORDER_YAML = "toc_includes_gen.yaml"
+const DIRNAME_INCLUDES = "includes";
+const DIRNAME_INCLUDE_SEGMENTS = "_include-segments";
 
 const process = {};
 
@@ -498,21 +500,23 @@ file.dir.files.get =  function (filenames, data){
   const currentDir = data.sourcePath;
   // Ensure 'includes' dir is last entry so it gets processed last
   if(currentDir === sourcePath){
-    const targetIndex = filenames.indexOf('includes');
-    if( targetIndex !== -1){
-      // swap with last elemenent
-      let lastIndex =  filenames.length - 1;
-      let temp = filenames[lastIndex];
-      filenames[lastIndex] = filenames[targetIndex];
-      filenames[targetIndex] = temp;
-    } else {
-      // Ensure includes dir, and push to filesnames array
-      try {
-        fse.ensureDir(path.join(sourcePath, 'includes'));
-        filenames.push('includes');
-      } catch (err) {
+    // remove DIRNAME_INCLUDE_SEGMENTS to avoid processing it
+    let targetIndex = filenames.indexOf(DIRNAME_INCLUDE_SEGMENTS);
+    if(targetIndex > -1) { // only splice array when item is found
+      filenames.splice(targetIndex, 1); // 2nd parameter means remove one item only
+    }
+
+    // remove DIRNAME_INCLUDES first, and add later at the end of array to ensure it is processed last
+    targetIndex = filenames.indexOf(DIRNAME_INCLUDES);
+    if(targetIndex > -1) { // only splice array when item is found
+      filenames.splice(targetIndex, 1); // 2nd parameter means remove one item only
+    }
+    // Ensure includes dir, and push to filesnames array at the end
+    try {
+        fse.ensureDir(path.join(sourcePath, DIRNAME_INCLUDES));
+        filenames.push(DIRNAME_INCLUDES);
+    } catch (err) {
         logger.info(err)
-      }
     }
   }
   return filenames;
