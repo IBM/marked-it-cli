@@ -2,6 +2,12 @@
 
 This project uses [semantic versioning](http://semver.org/).
 
+## [2.2.0] 2022-09-15
+1. Added support for specifying a per-repo "keyref.yaml" file. If this file is found in a source repository's root directory then it is parsed and its defined values are applied to variables encountered within the repo.
+2. Added two extension points:
+    - `process.onExit`: Provides an opportunity for extensions to perform any required cleanup.
+    - `file.dir.files.get`: Enables extensions to specify the ordered list of files and directories to be processed.
+
 ## [2.1.2] 2022-08-15
 Fix replaceVariables() problem.
 
