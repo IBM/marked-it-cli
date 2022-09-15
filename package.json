@@ -1,7 +1,7 @@
 {
 	"name": "marked-it-cli",
 	"description": "A CLI for marked-it.  Performs markdown->HTML and (optionally) TOC generation for a collection of markdown source files.",
-	"version": "2.1.3",
+	"version": "2.2.0",
 	"author": "Grant Gayed <grant_gayed@ca.ibm.com>",
 	"license": "MIT",
 	"homepage": "https://github.com/ibm/marked-it-cli",
@@ -31,6 +31,7 @@
 		"js-yaml": "3.13.1",
 		"htmlparser2": "3.8.3",
 		"js-beautify": "1.6.4",
+		"lodash": "4.17.21",
 		"fs-extra": "1.0.0",
 		"gitignore-parser": "0.0.2",
 		"highlight.js": "11.1.0"
