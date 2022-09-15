@@ -8,6 +8,9 @@ This project uses [semantic versioning](http://semver.org/).
     - `process.onExit`: Provides an opportunity for extensions to perform any required cleanup.
     - `file.dir.files.get`: Enables extensions to specify the ordered list of files and directories to be processed.
 
+## [2.1.3] 2022-08-26
+Pick up the latest marked-it-core.
+
 ## [2.1.2] 2022-08-15
 Fix replaceVariables() problem.
 
