@@ -89,7 +89,7 @@ function copyImageLinkFiles(srcFilePath, destDir) {
     }
   } catch (error) {
     // Throw error if not able to read the file
-    logger.info(err);
+    // logger.info(err);
   }
 }
 
