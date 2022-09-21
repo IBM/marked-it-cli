@@ -25,7 +25,6 @@
 const mdProcessor = require("../lib/mdProcessor");
 const logger = require("../lib/logger");
 
-const ARG_SOURCEDIR = "--sourceDir";
 const ARG_OUTPUT = "--output";
 const SWITCH_OVERWRITE = "--overwrite";
 const SWITCH_ATTRIBUTES = "--disable-attributes";
