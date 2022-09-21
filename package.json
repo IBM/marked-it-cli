@@ -25,6 +25,9 @@
 		"lib",
 		"example"
 	],
+	"scripts": {
+		"tests": "mocha test/testsV2.js"
+	},
 	"dependencies": {
 		"marked-it-core": "2.1.1",
 		"wkhtmltopdf": "0.1.5",
@@ -35,5 +38,8 @@
 		"fs-extra": "1.0.0",
 		"gitignore-parser": "0.0.2",
 		"highlight.js": "11.1.0"
+	},
+	"devDependencies": {
+		"mocha": "^10.0.0"
 	}
 }
