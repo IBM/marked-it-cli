@@ -403,8 +403,11 @@ md.variables.add = function (obj, data) {
         // Check for nested includes if any before writing the content as value
         // checkNested(modifiedFileContent, matches_len, sections_len);
         [matches_len, sections_len] = checkNested(fileContent, matches_len, sections_len);
+        // Add start and and comment
+        const startComment = `\n<!-- Include START: ${mdFilePath} -->\n`;
+        const endComment = `\n<!-- Include END: ${mdFilePath} -->\n`;
+        obj[mdFilePath] = startComment + modifiedFileContent + endComment;
 
-        obj[mdFilePath] = modifiedFileContent;
 
       } catch (e) {
         logger.warning("Error occurred reading variable-included file " + mdFilePath + ":\n" + e);
@@ -450,8 +453,10 @@ md.variables.add = function (obj, data) {
 
         // Check for nested includes(sections) if any before writing the content as value
         [matches_len, sections_len] = checkNested(modifiedFileContent, matches_len, sections_len);
-        
-        obj[fullSectionId] = parsedSections[sectionId];
+        // Add start and and comment
+        const startComment = `\n<!-- Include START: ${fullSectionId} -->\n`;
+        const endComment = `\n<!-- Include END: ${fullSectionId} -->\n`;
+        obj[fullSectionId] = startComment + parsedSections[sectionId] + endComment;
       } catch (e) {
         logger.warning("Error occurred reading variable-included file " + mdFilePath + ":\n" + e);
       }
