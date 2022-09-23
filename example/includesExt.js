@@ -289,7 +289,7 @@ toc.get = function (obj, data) {
 // Keyref processing
 function processKeyrefs(fileContent, data) {
   const { fullpath_mdFilePath, globalKeyrefMapCopy } = data;
-  console.log('Debug: ', fullpath_mdFilePath);
+  // console.log('Debug: ', fullpath_mdFilePath);
 
   const clone_globalKeyrefMapCopy = _.merge({}, globalKeyrefMapCopy);
   // Get file name and dir path
@@ -309,14 +309,14 @@ function processKeyrefs(fileContent, data) {
     // keyStore = _.merge(keyStore, localKeyrefMap.site.data, clone_globalKeyrefMapCopy.site.data);
     keyStore = _.merge({}, localKeyrefMap.site.data);
     keyStore = _.merge(keyStore, clone_globalKeyrefMapCopy.site.data);
-    console.dir("Debug: Merging complete... ", keyStore);
+    // console.dir("Debug: Merging complete... ", keyStore);
 
     // keyStore = Object.assign(keyStore, jsYaml.safeLoad(fse.readFileSync(keyrefPath)));
   } catch (e) {
-    logger.warning("Failed to parse keyref file: " + keyrefPath + "\n" + e.toString());
+    // logger.warning("Failed to parse keyref file: " + keyrefPath + "\n" + e.toString());
   }
 
-  console.dir(keyStore);
+  // console.dir(keyStore);
   const re_keyref = /(\{\{)site.data.(.*)(\}\})/g;
 
   try {
