@@ -25,6 +25,12 @@ const jsYaml = require("js-yaml");
 
 let logger;
 let sourcePath;
+// let globalKeyrefMapCopy = {site: {data: {}}};
+let globalKeyrefMapCopy;
+
+// Requiring the lodash library for _merge(Deep copy)
+const _ = require("lodash");
+
 const FILENAME_INCLUDES_GEN_TOC_ORDER_YAML = "toc_includes_gen.yaml"
 const DIRNAME_INCLUDES = "includes";
 const DIRNAME_INCLUDE_SEGMENTS = "_include-segments";
@@ -229,6 +235,10 @@ const init = function (data) {
   logger = data.logger;
   sourcePath = data.sourcePath;
   logger.info("Started includes extension...");
+  // globalKeyrefMapCopy.site.data = JSON.parse(JSON.stringify(data.keyrefMap)); // Deep copy
+  globalKeyrefMapCopy = JSON.parse(JSON.stringify(data.keyrefMap)); // Deep copy
+
+  // globalKeyrefMapCopy = data.keyrefMap;
 
   // Read toc.yaml file
   try {
@@ -278,21 +288,35 @@ toc.get = function (obj, data) {
 
 // Keyref processing
 function processKeyrefs(fileContent, data) {
-  const { fullpath_mdFilePath } = data;
+  const { fullpath_mdFilePath, globalKeyrefMapCopy } = data;
+  console.log('Debug: ', fullpath_mdFilePath);
 
+  const clone_globalKeyrefMapCopy = _.merge({}, globalKeyrefMapCopy);
   // Get file name and dir path
   const baseDirName = path.dirname(fullpath_mdFilePath);
   // Check for keyref.yaml and Process if available
   const FILENAME_KEYREF = 'keyref.yaml';
   let keyrefPath = path.join(baseDirName, FILENAME_KEYREF);
 
+  let localKeyrefMap = {site: {data: {}}};
+
+  // globalKeyrefMapCopy.site.data = JSON.parse(JSON.stringify(variables.site.data)); // Deep copy
   let keyStore = {};
+
   try {
-    keyStore = Object.assign(keyStore, jsYaml.safeLoad(fse.readFileSync(keyrefPath)));
+    // localKeyrefMap.site.data = jsYaml.safeLoad(common.readFile(fd));
+    localKeyrefMap.site.data = jsYaml.safeLoad(fse.readFileSync(keyrefPath));
+    // keyStore = _.merge(keyStore, localKeyrefMap.site.data, clone_globalKeyrefMapCopy.site.data);
+    keyStore = _.merge({}, localKeyrefMap.site.data);
+    keyStore = _.merge(keyStore, clone_globalKeyrefMapCopy.site.data);
+    console.dir("Debug: Merging complete... ", keyStore);
+
+    // keyStore = Object.assign(keyStore, jsYaml.safeLoad(fse.readFileSync(keyrefPath)));
   } catch (e) {
     logger.warning("Failed to parse keyref file: " + keyrefPath + "\n" + e.toString());
   }
 
+  console.dir(keyStore);
   const re_keyref = /(\{\{)site.data.(.*)(\}\})/g;
 
   try {
@@ -326,7 +350,7 @@ md.variables.add = function (obj, data) {
   const { sourcePath, fileText, parseMarkdownSections } = data;
   const sourceDirPath = path.dirname(sourcePath);
   logger.info("Processing file " + sourcePath);
-
+  
   // Initialize length for matches and sections
   let matches_len = 0;
   let sections_len = 0;
@@ -389,7 +413,9 @@ md.variables.add = function (obj, data) {
         fileContent = fse.readFileSync(fullpath_mdFilePath, 'utf8');
         // process Keyrefs
         fileContent = processKeyrefs(fileContent,
-          { fullpath_mdFilePath }
+          { fullpath_mdFilePath,
+            globalKeyrefMapCopy
+          }
         );
 
         // Process content for links(image)
@@ -444,7 +470,9 @@ md.variables.add = function (obj, data) {
         fileContent = fse.readFileSync(fullpath_mdFilePath, 'utf8');
         // process Keyrefs
         fileContent = processKeyrefs(fileContent,
-          { fullpath_mdFilePath }
+          { fullpath_mdFilePath,
+            globalKeyrefMapCopy
+          }
         );
         // Update the results
         const modifiedFileContent = processImageLinks(fileContent, mdFilePath, fullpath_mdFilePath, sourceDirPath);
