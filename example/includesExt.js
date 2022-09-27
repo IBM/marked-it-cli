@@ -440,8 +440,8 @@ md.variables.add = function (obj, data) {
       }
     }
 
-    // Return updated matches_len
-    return matches_len;
+    // Return updated matches_len and sections_len
+    return [matches_len, sections_len];
   }
 
   function sections_processItem(item, matches_len, sections_len){
@@ -490,31 +490,46 @@ md.variables.add = function (obj, data) {
       }
     }
 
-    // Return updated sections_len
-    return sections_len;
+    // Return updated matches_len and sections_len
+    return [matches_len, sections_len];
   }
   
   // TODO: 
   // 1. refactor merge common code for matches and sections
   // 2. for nested case, process for both matches and sections
 
-  // Check for valid .md file paths in results
-  if (matches) {
-    matches_len = matches.length;
-    for(let i=0; i<matches_len; i++){
-      let item = matches[i];
-      // Update matches_len if nested paths are found
-      matches_len = matches_processItem(item, matches_len, sections_len);
+  /* one file can have both, more inclued files and more sections
+  / Similarly , one section can have both, more inclued files and more sections
+  */
+  if(matches || matches_section) {
+    if (matches) {
+      matches_len = matches.length;
+    } else {
+      matches_len = 0;
     }
-  }
+    if (matches_section) {
+      sections_len = matches_section.length;
+    } else {
+      sections_len = 0;
+    }
+    let processed_matches_count = 0;
+    let processed_sections_count = 0;
 
-  // Check for sections in .md files
-  if (matches_section) {
-    sections_len = matches_section.length;
-    for(let i=0; i<sections_len; i++){
-      let item = matches_section[i];
-      // Update matches_len if nested paths are found
-      sections_len = sections_processItem(item, matches_len, sections_len);
+    while(processed_matches_count < matches_len || processed_sections_count < sections_len) {
+      let item;
+      if(processed_matches_count < matches_len) {
+        // Update matches and section len if nested paths are found
+        item = matches[processed_matches_count];
+        [matches_len, sections_len] = matches_processItem(item, matches_len, sections_len);
+        processed_matches_count++;
+      }
+
+      if(processed_sections_count < sections_len) {
+        // Update matches and section len if nested paths are found
+        item = matches_section[processed_sections_count];
+        [matches_len, sections_len] = sections_processItem(item, matches_len, sections_len);
+        processed_sections_count++;
+      }
     }
   }
   return obj;
