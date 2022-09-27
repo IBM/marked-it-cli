@@ -375,13 +375,13 @@ md.variables.add = function (obj, data) {
 
       if(nested_matches) {
         // TODO: Ensure unique values in array, and cycle detection?
-        matches.push(...nested_matches);
+        matches = _.uniq(matches.push(...nested_matches));
         // Update matches_len
         matches_len = matches.length;
       }
       if(nested_sections){
         // TODO: Ensure unique values in array, and cycle detection?
-        matches_section.push(...nested_sections);
+        matches_section =_.uniq(matches_section.push(...nested_sections));
         // Update matches_len
         sections_len = matches_section.length;
       }
