@@ -375,13 +375,16 @@ md.variables.add = function (obj, data) {
 
       if(nested_matches) {
         // TODO: Ensure unique values in array, and cycle detection?
-        matches = _.uniq(matches.push(...nested_matches));
+        matches.push(...nested_matches);
+        matches = _.uniq(matches);
+
         // Update matches_len
         matches_len = matches.length;
       }
       if(nested_sections){
         // TODO: Ensure unique values in array, and cycle detection?
-        matches_section =_.uniq(matches_section.push(...nested_sections));
+        matches_section.push(...nested_sections);
+        matches_section =_.uniq(matches_section);
         // Update matches_len
         sections_len = matches_section.length;
       }
@@ -392,16 +395,12 @@ md.variables.add = function (obj, data) {
     return [matches_len, sections_len];
   }
 
-  function matches_processItem(item, matches_len, sections_len) {
-    const mdFilePath = item?.substring(
-      item.indexOf('{{') + 2,
-      item.lastIndexOf('}}')
-    );
-
+  function readFileContent(sourceDirPath, mdFilePath) {
     // Read mdFile and assign the content as key value pair in conrefMap
     const fullpath_mdFilePath = path.join(sourceDirPath, mdFilePath)
     let mdStat;
-    let fileContent;
+    // Default value
+    let fileContent = null;
 
     try {
       mdStat = fse.statSync(fullpath_mdFilePath);
@@ -411,40 +410,50 @@ md.variables.add = function (obj, data) {
     if (mdStat && mdStat.isFile()) {
       try {
         fileContent = fse.readFileSync(fullpath_mdFilePath, 'utf8');
-        // process Keyrefs
-        fileContent = processKeyrefs(fileContent,
-          { fullpath_mdFilePath,
-            globalKeyrefMapCopy
-          }
-        );
-
-        // Process content for links(image)
-        /* Function requires filecontent(string),
-          and paths(to determine destDir to copy required files in includes/<other-repo-root-dir>),
-          */
-        const modifiedFileContent = processImageLinks(fileContent, mdFilePath, fullpath_mdFilePath, sourceDirPath);
-        // Update the results
-        // Key is mdFilePath
-
-        // Check for nested includes if any before writing the content as value
-        // checkNested(modifiedFileContent, matches_len, sections_len);
-        [matches_len, sections_len] = checkNested(fileContent, matches_len, sections_len);
-        // Add start and and comment
-        const startComment = `\n<!-- Include START: ${mdFilePath} -->\n`;
-        const endComment = `\n<!-- Include END: ${mdFilePath} -->\n`;
-        obj[mdFilePath] = startComment + modifiedFileContent + endComment;
-
-
       } catch (e) {
-        logger.warning("Error occurred reading variable-included file " + mdFilePath + ":\n" + e);
+        // this file is not present, which is fine, just continue
       }
     }
+    return {fileContent , fullpath_mdFilePath};
+  }
 
+  function matches_processItem(item, matches_len, sections_len) {
+    const mdFilePath = item?.substring(
+      item.indexOf('{{') + 2,
+      item.lastIndexOf('}}')
+    );
+
+    let {fileContent , fullpath_mdFilePath} = readFileContent(sourceDirPath, mdFilePath);
+
+    if (fileContent) {
+      // Process content for links(image)
+      /* Function requires filecontent(string),
+          and paths(to determine destDir to copy required files in includes/<other-repo-root-dir>),
+          */
+      const modifiedFileContent = processImageLinks(
+        fileContent,
+        mdFilePath,
+        fullpath_mdFilePath,
+        sourceDirPath
+      );
+      // Check for nested includes if any before writing the content as value
+      // checkNested(modifiedFileContent, matches_len, sections_len);
+      [matches_len, sections_len] = checkNested(
+        fileContent,
+        matches_len,
+        sections_len
+      );
+      // Add start and and comment
+      const startComment = `\n<!-- Include START: ${mdFilePath} -->\n`;
+      const endComment = `\n<!-- Include END: ${mdFilePath} -->\n`;
+      // Update the results, key is mdFilePath
+      obj[mdFilePath] = startComment + modifiedFileContent + endComment;
+    }
     // Return updated matches_len and sections_len
     return [matches_len, sections_len];
   }
 
-  function sections_processItem(item, matches_len, sections_len){
+  function sections_processItem(item, matches_len, sections_len) {
     const fullSectionId = item?.substring(
       item.indexOf('{{') + 2,
       item.lastIndexOf('}}')
@@ -455,48 +464,37 @@ md.variables.add = function (obj, data) {
     const mdFilePath = result[0];
     const sectionId = result[1];
 
-    // Read mdFile and assign the content as key value pair in conrefMap
-    const fullpath_mdFilePath = path.join(sourceDirPath, mdFilePath)
-    let mdStat;
-    let fileContent;
-
-    try {
-      mdStat = fse.statSync(fullpath_mdFilePath);
-    } catch (e) {
-      // this file is not present, which is fine, just continue
-    }
-    if (mdStat && mdStat.isFile()) {
-      try {
-        fileContent = fse.readFileSync(fullpath_mdFilePath, 'utf8');
-        // process Keyrefs
-        fileContent = processKeyrefs(fileContent,
-          { fullpath_mdFilePath,
-            globalKeyrefMapCopy
-          }
-        );
-        // Update the results
-        const modifiedFileContent = processImageLinks(fileContent, mdFilePath, fullpath_mdFilePath, sourceDirPath);
-        let parsedSections = parseMarkdownSections(modifiedFileContent, true);
-        // Key is fullSectionId, that will be used in obj for further processing in conrefs
-
-        // Check for nested includes(sections) if any before writing the content as value
-        [matches_len, sections_len] = checkNested(modifiedFileContent, matches_len, sections_len);
-        // Add start and and comment
-        const startComment = `\n<!-- Include START: ${fullSectionId} -->\n`;
-        const endComment = `\n<!-- Include END: ${fullSectionId} -->\n`;
-        obj[fullSectionId] = startComment + parsedSections[sectionId] + endComment;
-      } catch (e) {
-        logger.warning("Error occurred reading variable-included file " + mdFilePath + ":\n" + e);
-      }
+    let {fileContent , fullpath_mdFilePath} = readFileContent(sourceDirPath, mdFilePath);
+    if (fileContent) {
+      fileContent = processKeyrefs(fileContent, {
+        fullpath_mdFilePath,
+        globalKeyrefMapCopy,
+      });
+      // Update the results
+      const modifiedFileContent = processImageLinks(
+        fileContent,
+        mdFilePath,
+        fullpath_mdFilePath,
+        sourceDirPath
+      );
+      let parsedSections = parseMarkdownSections(modifiedFileContent, true);
+      // Check for nested includes(sections) if any before writing the content as value
+      [matches_len, sections_len] = checkNested(
+        modifiedFileContent,
+        matches_len,
+        sections_len
+      );
+      // Add start and and comment
+      const startComment = `\n<!-- Include START: ${fullSectionId} -->\n`;
+      const endComment = `\n<!-- Include END: ${fullSectionId} -->\n`;
+      // Key is fullSectionId, that will be used in obj for further processing in conrefs
+      obj[fullSectionId] =
+        startComment + parsedSections[sectionId] + endComment;
     }
 
     // Return updated matches_len and sections_len
     return [matches_len, sections_len];
   }
-  
-  // TODO: 
-  // 1. refactor merge common code for matches and sections
-  // 2. for nested case, process for both matches and sections
 
   /* one file can have both, more inclued files and more sections
   / Similarly , one section can have both, more inclued files and more sections
