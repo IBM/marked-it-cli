@@ -345,12 +345,27 @@ function processKeyrefs(fileContent, data) {
   return fileContent;
 }
 
+function tracePath(match, p1, filePath) {
+  const fileDir = path.dirname(filePath);
+
+  // sourcePath is inputDir, which is passed to extension in init method
+  let rootRepo = path.relative(sourcePath, fileDir);
+  if(rootRepo === '') rootRepo = '.';
+
+  let relativeTracePath = [rootRepo, p1].join(path.sep);
+
+  // Update the match with modified path to trace bakc later
+  const updated_match = '{{' + relativeTracePath + '}}';
+  return updated_match;
+}
+
 const md = { variables: {} }
 md.variables.add = function (obj, data) {
   const { sourcePath, fileText, parseMarkdownSections } = data;
   const sourceDirPath = path.dirname(sourcePath);
+  let fileTextCopy = fileText;
   logger.info("Processing file " + sourcePath);
-  
+
   // Initialize length for matches and sections
   let matches_len = 0;
   let sections_len = 0;
@@ -360,11 +375,19 @@ md.variables.add = function (obj, data) {
 
   // Regex search for anything between '{{' and '}}'
   // const re = new RegExp('\{\{.+\.md\}\}', 'g');
-  const re = /\{\{.+\.md\}\}/g;
-  let matches = fileText.match(re) || [];
+  // const re = /\{\{.+\.md\}\}/g;
+  const re = /\{\{(.+\.md)\}\}/g;
 
   // Regex search for section ids
-  const re_sections = /\{\{.+\.md#.+\}\}/g;
+  // const re_sections = /\{\{.+\.md#.+\}\}/g;
+  const re_sections = /\{\{(.+\.md#.+)\}\}/g;
+
+  // Replace the regex matches with path relative to inputDir
+  // so we can trace back the path during nested traversal
+  fileTextCopy = fileTextCopy.replace(re, (match, p1) => tracePath(match, p1, sourcePath));
+  fileTextCopy = fileTextCopy.replace(re_sections, (match, p1) => tracePath(match, p1, sourcePath));
+
+  let matches = fileText.match(re) || [];
   let matches_section = fileText.match(re_sections) || [];
 
   function checkNested(modifiedFileContent, matches_len, sections_len){
@@ -410,6 +433,9 @@ md.variables.add = function (obj, data) {
     if (mdStat && mdStat.isFile()) {
       try {
         fileContent = fse.readFileSync(fullpath_mdFilePath, 'utf8');
+        // Replace matches with tracePath to trackBack later
+        fileContent = fileContent.replace(re, (match, p1) => tracePath(match, p1, fullpath_mdFilePath));
+        fileContent = fileContent.replace(re_sections, (match, p1) => tracePath(match, p1, fullpath_mdFilePath));
       } catch (e) {
         // this file is not present, which is fine, just continue
       }
