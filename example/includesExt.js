@@ -348,8 +348,9 @@ function processKeyrefs(fileContent, data) {
 function tracePath(match, p1, filePath) {
   const fileDir = path.dirname(filePath);
 
-  // sourcePath is inputDir, which is passed to extension in init method
-  let rootRepo = path.relative(sourcePath, fileDir);
+  // decide the relative path always to the original FileText and sourceDir passed by mdProcessor
+  let rootRepo = path.relative(refDir, fileDir);
+
   if(rootRepo === '') rootRepo = '.';
 
   let relativeTracePath = [rootRepo, p1].join(path.sep);
@@ -359,10 +360,12 @@ function tracePath(match, p1, filePath) {
   return updated_match;
 }
 
+let refDir;
 const md = { variables: {} }
 md.variables.add = function (obj, data) {
   const { sourcePath, fileText, parseMarkdownSections } = data;
   const sourceDirPath = path.dirname(sourcePath);
+  refDir = sourceDirPath;
   let fileTextCopy = fileText;
   logger.info("Processing file " + sourcePath);
 
