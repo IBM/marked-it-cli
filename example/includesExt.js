@@ -62,34 +62,36 @@ process.onExit = function cleanupTempFiles(obj, data) {
 const link_re = /(?:\[[^\]]*\])\(([^\)]*)\)/g;
 
 function processImageMatch(match, p1, full_mdFilePath, destDir, inputDir) {
-  let isUrl = p1.startsWith('http');
-  // If is link is external and not a file, do nothing and return
-  if(isUrl) {
-    return match;
+  if(match) {
+    let isUrl = p1.startsWith('http');
+    // If is link is external and not a file, do nothing and return
+    if(isUrl) {
+      return match;
+    }
+    // Extract img_filepath using substring method
+    const srcFileDir = path.dirname(full_mdFilePath);
+
+    // const start = match.indexOf('(') + 1;
+    const start = match.indexOf(p1);
+    // const end = match.lastIndexOf(')');
+    // const img_filepath = match?.substring(start, end);
+    const img_filepath = p1;
+    let srcImagePath = path.resolve(`${srcFileDir}/${img_filepath}`);
+    let destImagePath = path.resolve(`${destDir}/${img_filepath}`);
+    let destImageDir = path.dirname(path.resolve(destImagePath));
+
+    try {
+      fse.ensureDirSync(destImageDir);
+      fse.copySync(srcImagePath, destImagePath);
+    } catch (err) {
+      logger.info(err)
+    }
+
+    // Return new relative path for replacement
+    const relativePath = path.relative(inputDir, destImagePath);
+    const updated_match = match.slice(0, start) + relativePath + ')';
+    return updated_match;
   }
-  // Extract img_filepath using substring method
-  const srcFileDir = path.dirname(full_mdFilePath);
-
-  // const start = match.indexOf('(') + 1;
-  const start = match.indexOf(p1);
-  // const end = match.lastIndexOf(')');
-  // const img_filepath = match?.substring(start, end);
-  const img_filepath = p1;
-  let srcImagePath = path.resolve(`${srcFileDir}/${img_filepath}`);
-  let destImagePath = path.resolve(`${destDir}/${img_filepath}`);
-  let destImageDir = path.dirname(path.resolve(destImagePath));
-
-  try {
-    fse.ensureDirSync(destImageDir);
-    fse.copySync(srcImagePath, destImagePath);
-  } catch (err) {
-    logger.info(err)
-  }
-
-  // Return new relative path for replacement
-  const relativePath = path.relative(inputDir, destImagePath);
-  const updated_match = match.slice(0, start) + relativePath + ')';
-  return updated_match;
 }
 
 // Function to process image links in md fileContent
@@ -108,12 +110,6 @@ function processImageLinks(fileContent, mdFilePath, full_mdFilePath, inputDir) {
   const baseFileName = path.basename(destRelativePath);
 
   const destDir = path.resolve(inputDir, 'includes', baseDirName);
-  // Create directory structure for other-repo to get copied in
-  try {
-    fse.ensureDirSync(destDir);
-  } catch (err) {
-    logger.info(err)
-  }
 
   try {
     fileContent = fileContent.replace(link_re, (match, p1) => processImageMatch(match, p1, full_mdFilePath, destDir, inputDir));
