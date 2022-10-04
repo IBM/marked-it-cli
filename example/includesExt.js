@@ -195,13 +195,14 @@ function parseTopicsRecursive(topics, sourcePath) {
       }
       // Copy other-repo to main repo
       const destFilePath = path.resolve(destDir, baseFileName);
-      // To copy a file, NOTE: fse.copySync does not support file to dir copy like cp, syntax is srcFilePath to destFilePath 
-      try {
-        fse.copySync(srcFilePath, destFilePath);
-        // Call function to check for other file references (such as images)
-        copyImageLinkFiles(srcFilePath, destDir);
+
+      // Write {{includes/../<includeTopic>}} in a file, later will be expanded during md.variables.add step
+      try{
+        let resolvedFilePath = path.resolve(sourcePath, includeTopic);
+        let newRelativePath = path.relative(destDir, resolvedFilePath);
+        fse.writeFileSync(destFilePath, `{{${newRelativePath}}}`, 'utf8');
       } catch (err) {
-        // this file is not present, which is fine, just continue after displaying error
+        // throw error if file is not successfully written
         logger.info(err)
       }
 
@@ -365,6 +366,7 @@ function tracePath(match, p1, filePath) {
 
 let refDir;
 const md = { variables: {} }
+
 md.variables.add = function (obj, data) {
   const { sourcePath, fileText, parseMarkdownSections } = data;
   const sourceDirPath = path.dirname(sourcePath);
