@@ -61,47 +61,6 @@ process.onExit = function cleanupTempFiles(obj, data) {
 // regex for syntax -> [Link description](<Link>)
 const link_re = /(?:\[[^\]]*\])\(([^\)]*)\)/g;
 
-// Read the srcFile and check for other file references(such as images)
-function copyImageLinkFiles(srcFilePath, destDir) {
-  logger.info(`Searching for img links to copy for file: ${srcFilePath}`)
-  const srcFileDir = path.dirname(srcFilePath);
-
-  try {
-    let fileContent = fse.readFileSync(srcFilePath, "utf8");
-
-    let match_image_links = [];
-    // Using replace to just run callback fn
-    // If image link push to match_image_links, else Do nothing if link is external link and not a file
-    fileContent.replace(link_re, (match, p1) => {
-      let isUrl = item.startsWith('http');
-      if(!isUrl) {
-        match_image_links.push(p1);
-      }
-    });
-    // Check if match_image_links is not falsy (null/undefined)
-    if(match_image_links.length > 0) {
-      match_image_links.forEach(item => {
-        // Extract img_filepath using substring method
-        const img_filepath = item?.substring(
-          item.indexOf('(') + 1,
-          item.lastIndexOf(')'));
-        try {
-          let src = `${srcFileDir}/${img_filepath}`;
-          let dest = `${destDir}/${img_filepath}`;
-          fse.copySync(src, dest);
-        } catch (err) {
-          logger.info(err)
-        }
-      });
-    } else {
-      logger.info(`No link files to copy for file: ${srcFilePath}`);
-    }
-  } catch (error) {
-    // Throw error if not able to read the file
-    // logger.info(err);
-  }
-}
-
 function processImageMatch(match, p1, full_mdFilePath, destDir, inputDir) {
   let isUrl = p1.startsWith('http');
   // If is link is external and not a file, do nothing and return
