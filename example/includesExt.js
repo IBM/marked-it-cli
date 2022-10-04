@@ -32,7 +32,7 @@ let globalKeyrefMapCopy;
 const _ = require("lodash");
 
 const FILENAME_INCLUDES_GEN_TOC_ORDER_YAML = "toc_includes_gen.yaml"
-const DIRNAME_INCLUDES = "includes";
+const DIRNAME_INCLUDES = "_includes";
 const DIRNAME_INCLUDE_SEGMENTS = "_include-segments";
 
 const process = {};
@@ -41,7 +41,6 @@ const process = {};
 process.onExit = function cleanupTempFiles(obj, data) {
   const { sourcePath } = data;
   logger.info('Cleaning up generated temp files...');
-  const includesDir = path.join(sourcePath, 'includes');
   const tempTocFile = path.join(sourcePath, FILENAME_INCLUDES_GEN_TOC_ORDER_YAML);
 
   try {
@@ -109,7 +108,7 @@ function processImageLinks(fileContent, mdFilePath, full_mdFilePath, inputDir) {
   const baseDirName = path.dirname(destRelativePath);
   const baseFileName = path.basename(destRelativePath);
 
-  const destDir = path.resolve(inputDir, 'includes', baseDirName);
+  const destDir = path.resolve(inputDir, `${DIRNAME_INCLUDES}`, baseDirName);
 
   try {
     fileContent = fileContent.replace(link_re, (match, p1) => processImageMatch(match, p1, full_mdFilePath, destDir, inputDir));
@@ -141,7 +140,7 @@ function parseTopicsRecursive(topics, sourcePath) {
       const baseDirName = path.dirname(destRelativePath);
       const baseFileName = path.basename(destRelativePath);
 
-      const destDir = path.resolve(sourcePath, 'includes', baseDirName);
+      const destDir = path.resolve(sourcePath, `${DIRNAME_INCLUDES}`, baseDirName);
       // Create directory structure for other-repo to get copied in
       try {
         fse.ensureDirSync(destDir);
@@ -151,7 +150,7 @@ function parseTopicsRecursive(topics, sourcePath) {
       // Copy other-repo to main repo
       const destFilePath = path.resolve(destDir, baseFileName);
 
-      // Write {{includes/../<includeTopic>}} in a file, later will be expanded during md.variables.add step
+      // Write {{<newRelativePath for includeTopic}} in a file, later will be expanded during md.variables.add step
       try{
         let resolvedFilePath = path.resolve(sourcePath, includeTopic);
         let newRelativePath = path.relative(destDir, resolvedFilePath);
@@ -163,7 +162,7 @@ function parseTopicsRecursive(topics, sourcePath) {
 
       // Replace include keyword with topic
       topic.include = destRelativePath;
-      topic.topic = `includes/${topic.include}`;
+      topic.topic = `${DIRNAME_INCLUDES}/${topic.include}`;
       delete topic.include;
       resData.push(topic.topic)
     } else if (typeof topic?.topic === 'string') {
@@ -534,7 +533,7 @@ file.dir.files.get =  function (filenames, data){
   // sourcePath is inputDir which is populated in init function, data.sourcePath is currentDir
   // currentDir is the directory where generateHTML function is active
   const currentDir = data.sourcePath;
-  // Ensure 'includes' dir is last entry so it gets processed last
+  // Ensure `${DIRNAME_INCLUDES}` dir is last entry so it gets processed last
   if(true){ // Filter out DIRNAME_INCLUDE_SEGMENTS, and ensure 
     // remove DIRNAME_INCLUDE_SEGMENTS to avoid processing it DIRNAME_INCLUDES processed at end
     let targetIndex = filenames.indexOf(DIRNAME_INCLUDE_SEGMENTS);
@@ -550,7 +549,7 @@ file.dir.files.get =  function (filenames, data){
       removeIncludesList.push(localIncludesDirPath);
 
       filenames.splice(targetIndex, 1); // 2nd parameter means remove one item only
-      // Ensure includes dir, and push to filesnames array at the end
+      // Ensure `${DIRNAME_INCLUDES}` dir, and push to filesnames array at the end
       try {
         fse.ensureDir(path.join(sourcePath, DIRNAME_INCLUDES));
         filenames.push(DIRNAME_INCLUDES);
