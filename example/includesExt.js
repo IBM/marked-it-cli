@@ -595,13 +595,13 @@ file.dir.files.get =  function (filenames, data){
       removeIncludesList.push(localIncludesDirPath);
 
       filenames.splice(targetIndex, 1); // 2nd parameter means remove one item only
-    }
-    // Ensure includes dir, and push to filesnames array at the end
-    try {
+      // Ensure includes dir, and push to filesnames array at the end
+      try {
         fse.ensureDir(path.join(sourcePath, DIRNAME_INCLUDES));
         filenames.push(DIRNAME_INCLUDES);
-    } catch (err) {
+      } catch (err) {
         logger.info(err)
+      }
     }
   }
   return filenames;
