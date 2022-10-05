@@ -149,12 +149,34 @@ function parseTopicsRecursive(topics, sourcePath) {
       }
       // Copy other-repo to main repo
       const destFilePath = path.resolve(destDir, baseFileName);
+      // Read content to extract frontMatter
+      let frontMatter = null;
+      try {
+        fileContent = fse.readFileSync(srcFilePath, 'utf8');
+        // Get frontMatter
+        let frontMatterResult = extractFrontMatter(fileContent);
+        if (frontMatterResult) {
+          /* YAML front matter was present */
+          if (frontMatterResult.error) {
+            log.info("Failed to parse front matter: " + frontMatterResult.error.toString());
+          } else {
+            frontMatter = frontMatterResult.frontMatter;
+          }
+        }
+      } catch (e) {
+        // this file is not present, which is fine, just continue
+      }
 
       // Write {{<newRelativePath for includeTopic}} in a file, later will be expanded during md.variables.add step
       try{
         let resolvedFilePath = path.resolve(sourcePath, includeTopic);
         let newRelativePath = path.relative(destDir, resolvedFilePath);
-        fse.writeFileSync(destFilePath, `{{${newRelativePath}}}`, 'utf8');
+        let toWriteData = `{{${newRelativePath}}}`;
+        if(frontMatter) {
+          let formatterFrontMatterString = `---\n${frontMatter}\n---`;
+          toWriteData = formatterFrontMatterString + "\n" + toWriteData;
+        }
+        fse.writeFileSync(destFilePath, toWriteData, 'utf8');
       } catch (err) {
         // throw error if file is not successfully written
         logger.info(err)
