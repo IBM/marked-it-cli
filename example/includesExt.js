@@ -213,10 +213,6 @@ const init = function (data) {
   logger = data.logger;
   sourcePath = data.sourcePath;
   logger.info("Started includes extension...");
-  // globalKeyrefMapCopy.site.data = JSON.parse(JSON.stringify(data.keyrefMap)); // Deep copy
-  globalKeyrefMapCopy = JSON.parse(JSON.stringify(data.keyrefMap)); // Deep copy
-
-  // globalKeyrefMapCopy = data.keyrefMap;
 
   // Read toc.yaml file
   try {
@@ -385,6 +381,8 @@ const md = { variables: {} }
 
 md.variables.add = function (obj, data) {
   const { sourcePath, fileText, parseMarkdownSections } = data;
+  globalKeyrefMapCopy = JSON.parse(JSON.stringify(data.globalKeyrefMapCopy)); // Deep copy
+
   const sourceDirPath = path.dirname(sourcePath);
   refDir = sourceDirPath;
   let fileTextCopy = fileText;
