@@ -479,6 +479,10 @@ md.variables.add = function (obj, data) {
           fileContent = frontMatterResult.text;
         }
       }
+      fileContent = processKeyrefs(fileContent, {
+        fullpath_mdFilePath,
+        globalKeyrefMapCopy,
+      });
       // Process content for links(image)
       /* Function requires filecontent(string),
           and paths(to determine destDir to copy required files in includes/<other-repo-root-dir>),
