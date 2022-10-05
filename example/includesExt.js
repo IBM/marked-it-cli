@@ -32,7 +32,7 @@ let globalKeyrefMapCopy;
 const _ = require("lodash");
 
 const FILENAME_INCLUDES_GEN_TOC_ORDER_YAML = "toc_includes_gen.yaml"
-const DIRNAME_INCLUDES = "_includes";
+const DIRNAME_INCLUDES = "includes";
 const DIRNAME_INCLUDE_SEGMENTS = "_include-segments";
 
 const process = {};
