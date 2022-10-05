@@ -318,6 +318,54 @@ function tracePath(match, p1, filePath) {
   return updated_match;
 }
 
+// Regex for frontMatter start and end markers
+const DELIMITER_FRONTMATTER = /(?:^|\n)---\r?\n/g;
+
+// function is taken from marked-it-core > marked-it.js
+// with a small diffrence in return statment, here we are also returning the frontMatter with the result and text
+function extractFrontMatter(text) {
+  // Strip out header or frontMatter from included files and sections
+  // The frontmatter is only expected in direct .md file or topics,
+  // in the included files and sections it is redundant
+  /* frontMatter Sample
+  ---
+
+  copyright:
+    years: 2015, 2022
+  lastupdated: "2022-03-22"
+
+  content-type: release-note
+
+  ---
+  */
+  DELIMITER_FRONTMATTER.lastIndex = 0;
+  let startMatch = DELIMITER_FRONTMATTER.exec(text);
+  if (!(startMatch && startMatch.index === 0)) {
+    return null; /* no valid start delimiter */
+  }
+
+  let endMatch = DELIMITER_FRONTMATTER.exec(text);
+  if (!endMatch) {
+    return null; /* no end delimiter */
+  }
+
+  let frontMatter = text.substring(startMatch[0].length, endMatch.index);
+  try {
+    let result = jsYaml.safeLoad(frontMatter);
+    if (typeof result === 'string') {
+      /* in some cases jsYaml returns the invalid source string rather than throwing an error */
+      return { error: 'Invalid YAML syntax' };
+    }
+    return {
+      frontMatter: frontMatter,
+      map: result,
+      text: text.substring(endMatch.index + endMatch[0].length),
+    };
+  } catch (e) {
+    return { error: e };
+  }
+}
+
 let refDir;
 const md = { variables: {} }
 
@@ -414,6 +462,16 @@ md.variables.add = function (obj, data) {
     let {fileContent , fullpath_mdFilePath} = readFileContent(sourceDirPath, mdFilePath);
 
     if (fileContent) {
+      // Strip frontMatter
+      let frontMatterResult = extractFrontMatter(fileContent);
+      if (frontMatterResult) {
+        /* YAML front matter was present */
+        if (frontMatterResult.error) {
+          log.info("Failed to parse front matter: " + frontMatterResult.error.toString());
+        } else {
+          fileContent = frontMatterResult.text;
+        }
+      }
       // Process content for links(image)
       /* Function requires filecontent(string),
           and paths(to determine destDir to copy required files in includes/<other-repo-root-dir>),
@@ -454,6 +512,16 @@ md.variables.add = function (obj, data) {
 
     let {fileContent , fullpath_mdFilePath} = readFileContent(sourceDirPath, mdFilePath);
     if (fileContent) {
+      // Strip frontMatter
+      let frontMatterResult = extractFrontMatter(fileContent);
+      if (frontMatterResult) {
+        /* YAML front matter was present */
+        if (frontMatterResult.error) {
+          log.info("Failed to parse front matter: " + frontMatterResult.error.toString());
+        } else {
+          fileContent = frontMatterResult.text;
+        }
+      }
       fileContent = processKeyrefs(fileContent, {
         fullpath_mdFilePath,
         globalKeyrefMapCopy,
