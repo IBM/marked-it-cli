@@ -95,8 +95,6 @@ function processImageMatch(match, p1, full_mdFilePath, destDir, inputDir) {
 
 // Function to process image links in md fileContent
 function processImageLinks(fileContent, mdFilePath, full_mdFilePath, inputDir) {
-  // console.log(fileContent);
-  logger.info(`Searching for img links in file: ${mdFilePath}`);
   // ^ -> beginning
   // \W -> Matches any character that is not a word character (alphanumeric & underscore). Equivalent to [^A-Za-z0-9_]
   const re = /^\W+/;
@@ -233,7 +231,6 @@ const init = function (data) {
     const yamlOutput = jsYaml.safeDump(data);
     const outputFilename = FILENAME_INCLUDES_GEN_TOC_ORDER_YAML;
     const path_outputFilename = path.join(sourcePath, outputFilename);
-    // TODO: Cleanup intermediate temp file
     fse.writeFileSync(path_outputFilename, yamlOutput);
   } catch (err) {
     logger.info(err)
@@ -269,7 +266,6 @@ toc.get = function (obj, data) {
 // Keyref processing
 function processKeyrefs(fileContent, data) {
   const { fullpath_mdFilePath, globalKeyrefMapCopy } = data;
-  // console.log('Debug: ', fullpath_mdFilePath);
 
   const clone_globalKeyrefMapCopy = _.merge({}, globalKeyrefMapCopy);
   // Get file name and dir path
@@ -289,14 +285,10 @@ function processKeyrefs(fileContent, data) {
     // keyStore = _.merge(keyStore, localKeyrefMap.site.data, clone_globalKeyrefMapCopy.site.data);
     keyStore = _.merge({}, localKeyrefMap.site.data);
     keyStore = _.merge(keyStore, clone_globalKeyrefMapCopy.site.data);
-    // console.dir("Debug: Merging complete... ", keyStore);
-
-    // keyStore = Object.assign(keyStore, jsYaml.safeLoad(fse.readFileSync(keyrefPath)));
   } catch (e) {
     // logger.warning("Failed to parse keyref file: " + keyrefPath + "\n" + e.toString());
   }
 
-  // console.dir(keyStore);
   const re_keyref = /(\{\{)site.data.(.*)(\}\})/g;
 
   try {
@@ -405,13 +397,10 @@ md.variables.add = function (obj, data) {
   // NOTE: str.match return null if no match is found, but we can find further matches later during nested case
   // So either set successful matches or empty array
 
-  // Regex search for anything between '{{' and '}}'
-  // const re = new RegExp('\{\{.+\.md\}\}', 'g');
-  // const re = /\{\{.+\.md\}\}/g;
+  // Regex search for md files between '{{' and '}}'
   const re = /\{\{(.+\.md)\}\}/g;
 
   // Regex search for section ids
-  // const re_sections = /\{\{.+\.md#.+\}\}/g;
   const re_sections = /\{\{(.+\.md#.+)\}\}/g;
 
   // Replace the regex matches with path relative to inputDir
@@ -429,7 +418,6 @@ md.variables.add = function (obj, data) {
       let nested_sections = modifiedFileContent.match(re_sections);
 
       if(nested_matches) {
-        // TODO: Ensure unique values in array, and cycle detection?
         matches.push(...nested_matches);
         matches = _.uniq(matches);
 
@@ -437,7 +425,6 @@ md.variables.add = function (obj, data) {
         matches_len = matches.length;
       }
       if(nested_sections){
-        // TODO: Ensure unique values in array, and cycle detection?
         matches_section.push(...nested_sections);
         matches_section =_.uniq(matches_section);
         // Update matches_len
