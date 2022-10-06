@@ -2,6 +2,9 @@
 
 This project uses [semantic versioning](http://semver.org/).
 
+## [2.2.1] 2022-10-06
+Updates to example/includesExt.js.
+
 ## [2.2.0] 2022-09-15
 1. Added support for specifying a per-repo "keyref.yaml" file. If this file is found in a source repository's root directory then it is parsed and its defined values are applied to variables encountered within the repo.
 2. Added two extension points:
