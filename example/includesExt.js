@@ -730,7 +730,11 @@ file.dir.files.get =  function (filenames, data){
 const md = {variables: {}}
 md.variables.add = function (obj, data) {
   const { sourcePath, fileText, parseMarkdownSections } = data;
+  globalKeyrefMapCopy = JSON.parse(JSON.stringify(data.globalKeyrefMapCopy)); // Deep copy
+
   const sourceDirPath = path.dirname(sourcePath);
+  refDir = sourceDirPath;
+  let fileTextCopy = fileText;
   logger.info("Processing file " + sourcePath);
 
   // Initialize length for matches and sections
@@ -740,13 +744,18 @@ md.variables.add = function (obj, data) {
   // NOTE: str.match return null if no match is found, but we can find further matches later during nested case
   // So either set successful matches or empty array
 
-  // Regex search for anything between '{{' and '}}'
-  // const re = new RegExp('\{\{.+\.md\}\}', 'g');
-  const re = /\{\{.+\.md\}\}/g;
-  let matches = fileText.match(re) || [];
+  // Regex search for md files between '{{' and '}}'
+  const re = /\{\{(.+\.md)\}\}/g;
 
   // Regex search for section ids
-  const re_sections = /\{\{.+\.md#.+\}\}/g;
+  const re_sections = /\{\{(.+\.md#.+)\}\}/g;
+
+  // Replace the regex matches with path relative to inputDir
+  // so we can trace back the path during nested traversal
+  fileTextCopy = fileTextCopy.replace(re, (match, p1) => tracePath(match, p1, sourcePath));
+  fileTextCopy = fileTextCopy.replace(re_sections, (match, p1) => tracePath(match, p1, sourcePath));
+
+  let matches = fileText.match(re) || [];
   let matches_section = fileText.match(re_sections) || [];
 
   function checkNested(modifiedFileContent, matches_len, sections_len){
@@ -756,14 +765,15 @@ md.variables.add = function (obj, data) {
       let nested_sections = modifiedFileContent.match(re_sections);
 
       if(nested_matches) {
-        // TODO: Ensure unique values in array, and cycle detection?
         matches.push(...nested_matches);
+        matches = _.uniq(matches);
+
         // Update matches_len
         matches_len = matches.length;
       }
       if(nested_sections){
-        // TODO: Ensure unique values in array, and cycle detection?
         matches_section.push(...nested_sections);
+        matches_section =_.uniq(matches_section);
         // Update matches_len
         sections_len = matches_section.length;
       }
@@ -774,16 +784,12 @@ md.variables.add = function (obj, data) {
     return [matches_len, sections_len];
   }
 
-  function matches_processItem(item, matches_len, sections_len) {
-    const mdFilePath = item?.substring(
-      item.indexOf('{{') + 2,
-      item.lastIndexOf('}}')
-    );
-
+  function readFileContent(sourceDirPath, mdFilePath) {
     // Read mdFile and assign the content as key value pair in conrefMap
     const fullpath_mdFilePath = path.join(sourceDirPath, mdFilePath)
     let mdStat;
-    let fileContent;
+    // Default value
+    let fileContent = null;
 
     try {
       mdStat = fse.statSync(fullpath_mdFilePath);
@@ -793,35 +799,67 @@ md.variables.add = function (obj, data) {
     if (mdStat && mdStat.isFile()) {
       try {
         fileContent = fse.readFileSync(fullpath_mdFilePath, 'utf8');
-        // process Keyrefs
-        fileContent = processKeyrefs(fileContent,
-          { fullpath_mdFilePath }
-        );
-
-        // Process content for links(image)
-        /* Function requires filecontent(string),
-          and paths(to determine destDir to copy required files in includes/<other-repo-root-dir>),
-          */
-        const modifiedFileContent = processImageLinks(fileContent, mdFilePath, fullpath_mdFilePath, sourceDirPath);
-        // Update the results
-        // Key is mdFilePath
-
-        // Check for nested includes if any before writing the content as value
-        // checkNested(modifiedFileContent, matches_len, sections_len);
-        [matches_len, sections_len] = checkNested(fileContent, matches_len, sections_len);
-
-        obj[mdFilePath] = modifiedFileContent;
-
+        // Replace matches with tracePath to trackBack later
+        fileContent = fileContent.replace(re, (match, p1) => tracePath(match, p1, fullpath_mdFilePath));
+        fileContent = fileContent.replace(re_sections, (match, p1) => tracePath(match, p1, fullpath_mdFilePath));
       } catch (e) {
-        logger.warning("Error occurred reading variable-included file " + mdFilePath + ":\n" + e);
+        // this file is not present, which is fine, just continue
       }
     }
-
-    // Return updated matches_len
-    return matches_len;
+    return {fileContent , fullpath_mdFilePath};
   }
 
-  function sections_processItem(item, matches_len, sections_len){
+  function matches_processItem(item, matches_len, sections_len) {
+    const mdFilePath = item?.substring(
+      item.indexOf('{{') + 2,
+      item.lastIndexOf('}}')
+    );
+
+    let {fileContent , fullpath_mdFilePath} = readFileContent(sourceDirPath, mdFilePath);
+
+    if (fileContent) {
+      // Strip frontMatter
+      let frontMatterResult = extractFrontMatter(fileContent);
+      if (frontMatterResult) {
+        /* YAML front matter was present */
+        if (frontMatterResult.error) {
+          log.info("Failed to parse front matter: " + frontMatterResult.error.toString());
+        } else {
+          fileContent = frontMatterResult.text;
+        }
+      }
+      fileContent = processKeyrefs(fileContent, {
+        fullpath_mdFilePath,
+        globalKeyrefMapCopy,
+      });
+      // Process content for links(image)
+      /* Function requires filecontent(string),
+          and paths(to determine destDir to copy required files in includes/<other-repo-root-dir>),
+          */
+      const modifiedFileContent = processImageLinks(
+        fileContent,
+        mdFilePath,
+        fullpath_mdFilePath,
+        sourceDirPath
+      );
+      // Check for nested includes if any before writing the content as value
+      // checkNested(modifiedFileContent, matches_len, sections_len);
+      [matches_len, sections_len] = checkNested(
+        fileContent,
+        matches_len,
+        sections_len
+      );
+      // Add start and and comment
+      const startComment = `\n<!-- Include START: ${mdFilePath} -->\n`;
+      const endComment = `\n<!-- Include END: ${mdFilePath} -->\n`;
+      // Update the results, key is mdFilePath
+      obj[mdFilePath] = startComment + modifiedFileContent + endComment;
+    }
+    // Return updated matches_len and sections_len
+    return [matches_len, sections_len];
+  }
+
+  function sections_processItem(item, matches_len, sections_len) {
     const fullSectionId = item?.substring(
       item.indexOf('{{') + 2,
       item.lastIndexOf('}}')
@@ -832,62 +870,80 @@ md.variables.add = function (obj, data) {
     const mdFilePath = result[0];
     const sectionId = result[1];
 
-    // Read mdFile and assign the content as key value pair in conrefMap
-    const fullpath_mdFilePath = path.join(sourceDirPath, mdFilePath)
-    let mdStat;
-    let fileContent;
-
-    try {
-      mdStat = fse.statSync(fullpath_mdFilePath);
-    } catch (e) {
-      // this file is not present, which is fine, just continue
-    }
-    if (mdStat && mdStat.isFile()) {
-      try {
-        fileContent = fse.readFileSync(fullpath_mdFilePath, 'utf8');
-        // process Keyrefs
-        fileContent = processKeyrefs(fileContent,
-          { fullpath_mdFilePath }
-        );
-        // Update the results
-        const modifiedFileContent = processImageLinks(fileContent, mdFilePath, fullpath_mdFilePath, sourceDirPath);
-        let parsedSections = parseMarkdownSections(modifiedFileContent, true);
-        // Key is fullSectionId, that will be used in obj for further processing in conrefs
-
-        // Check for nested includes(sections) if any before writing the content as value
-        [matches_len, sections_len] = checkNested(modifiedFileContent, matches_len, sections_len);
-        
-        obj[fullSectionId] = parsedSections[sectionId];
-      } catch (e) {
-        logger.warning("Error occurred reading variable-included file " + mdFilePath + ":\n" + e);
+    let {fileContent , fullpath_mdFilePath} = readFileContent(sourceDirPath, mdFilePath);
+    if (fileContent) {
+      // Strip frontMatter
+      let frontMatterResult = extractFrontMatter(fileContent);
+      if (frontMatterResult) {
+        /* YAML front matter was present */
+        if (frontMatterResult.error) {
+          log.info("Failed to parse front matter: " + frontMatterResult.error.toString());
+        } else {
+          fileContent = frontMatterResult.text;
+        }
       }
+      fileContent = processKeyrefs(fileContent, {
+        fullpath_mdFilePath,
+        globalKeyrefMapCopy,
+      });
+      // Update the results
+      const modifiedFileContent = processImageLinks(
+        fileContent,
+        mdFilePath,
+        fullpath_mdFilePath,
+        sourceDirPath
+      );
+      let parsedSections = parseMarkdownSections(modifiedFileContent, true);
+      // Check for nested includes(sections) if any before writing the content as value
+      [matches_len, sections_len] = checkNested(
+        modifiedFileContent,
+        matches_len,
+        sections_len
+      );
+      // Add start and and comment
+      const startComment = `\n<!-- Include START: ${fullSectionId} -->\n`;
+      const endComment = `\n<!-- Include END: ${fullSectionId} -->\n`;
+      // Key is fullSectionId, that will be used in obj for further processing in conrefs
+      obj[fullSectionId] =
+        startComment + parsedSections[sectionId] + endComment;
     }
 
-    // Return updated sections_len
-    return sections_len;
+    // Return updated matches_len and sections_len
+    return [matches_len, sections_len];
   }
-  
-  // TODO: 
-  // 1. refactor merge common code for matches and sections
-  // 2. for nested case, process for both matches and sections
 
-  // Check for valid .md file paths in results
-  if (matches) {
-    matches_len = matches.length;
-    for(let i=0; i<matches_len; i++){
-      let item = matches[i];
-      // Update matches_len if nested paths are found
-      matches_len = matches_processItem(item, matches_len, sections_len);
+  /* one file can have both, more inclued files and more sections
+  / Similarly , one section can have both, more inclued files and more sections
+  */
+  if(matches || matches_section) {
+    if (matches) {
+      matches_len = matches.length;
+    } else {
+      matches_len = 0;
     }
-  }
+    if (matches_section) {
+      sections_len = matches_section.length;
+    } else {
+      sections_len = 0;
+    }
+    let processed_matches_count = 0;
+    let processed_sections_count = 0;
 
-  // Check for sections in .md files
-  if (matches_section) {
-    sections_len = matches_section.length;
-    for(let i=0; i<sections_len; i++){
-      let item = matches_section[i];
-      // Update matches_len if nested paths are found
-      sections_len = sections_processItem(item, matches_len, sections_len);
+    while(processed_matches_count < matches_len || processed_sections_count < sections_len) {
+      let item;
+      if(processed_matches_count < matches_len) {
+        // Update matches and section len if nested paths are found
+        item = matches[processed_matches_count];
+        [matches_len, sections_len] = matches_processItem(item, matches_len, sections_len);
+        processed_matches_count++;
+      }
+
+      if(processed_sections_count < sections_len) {
+        // Update matches and section len if nested paths are found
+        item = matches_section[processed_sections_count];
+        [matches_len, sections_len] = sections_processItem(item, matches_len, sections_len);
+        processed_sections_count++;
+      }
     }
   }
   return obj;
@@ -900,13 +956,14 @@ const file = {
     },
 };
 
+let removeIncludesList = [];
 file.dir.files.get =  function (filenames, data){
   // sourcePath is inputDir which is populated in init function, data.sourcePath is currentDir
   // currentDir is the directory where generateHTML function is active
   const currentDir = data.sourcePath;
-  // Ensure 'includes' dir is last entry so it gets processed last
-  if(currentDir === sourcePath){
-    // remove DIRNAME_INCLUDE_SEGMENTS to avoid processing it
+  // Ensure `${DIRNAME_INCLUDES}` dir is last entry so it gets processed last
+  if(true){ // Filter out DIRNAME_INCLUDE_SEGMENTS, and ensure 
+    // remove DIRNAME_INCLUDE_SEGMENTS to avoid processing it DIRNAME_INCLUDES processed at end
     let targetIndex = filenames.indexOf(DIRNAME_INCLUDE_SEGMENTS);
     if(targetIndex > -1) { // only splice array when item is found
       filenames.splice(targetIndex, 1); // 2nd parameter means remove one item only
@@ -915,14 +972,20 @@ file.dir.files.get =  function (filenames, data){
     // remove DIRNAME_INCLUDES first, and add later at the end of array to ensure it is processed last
     targetIndex = filenames.indexOf(DIRNAME_INCLUDES);
     if(targetIndex > -1) { // only splice array when item is found
+      // Add entry for cleanup
+      let localIncludesDirPath = path.join(data.sourcePath, filenames[targetIndex]);
+      removeIncludesList.push(localIncludesDirPath);
+
       filenames.splice(targetIndex, 1); // 2nd parameter means remove one item only
     }
-    // Ensure includes dir, and push to filesnames array at the end
+    // Ensure `${DIRNAME_INCLUDES}` dir, and push to filesnames array at the end
     try {
-        fse.ensureDir(path.join(sourcePath, DIRNAME_INCLUDES));
-        filenames.push(DIRNAME_INCLUDES);
+      let includeDiePath = path.join(sourcePath, DIRNAME_INCLUDES)
+      fse.ensureDir(includeDiePath);
+      removeIncludesList.push(includeDiePath);
+      filenames.push(DIRNAME_INCLUDES);
     } catch (err) {
-        logger.info(err)
+      logger.info(err)
     }
   }
   return filenames;
