@@ -2,6 +2,9 @@
 
 This project uses [semantic versioning](http://semver.org/).
 
+## [2.2.2] 2022-10-12
+Fix variable substitution bug.
+
 ## [2.2.1] 2022-10-06
 Updates to example/includesExt.js.
 
