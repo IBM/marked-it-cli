@@ -30,6 +30,7 @@ const SWITCH_OVERWRITE = "--overwrite";
 const SWITCH_ATTRIBUTES = "--disable-attributes";
 const SWITCH_FOOTNOTES = "--disable-footnotes";
 const SWITCH_FRONTMATTER = "--disable-front-matter";
+const SWITCH_TASKLISTS = "--disable-task-lists";
 const SWITCH_PDF = "--gen-pdf";
 const SWITCH_VERBOSE = "--verbose";
 const SWITCH_DEBUG = "--debug";
@@ -48,7 +49,7 @@ const DEFAULT_TOC_DEPTH = 3;
 const REGEX_EXTENSION_ARG = /^--@([^:]+):([^$]+)$/
 
 let sourceDir, destDir;
-let overwrite, disableAttributes, disableFootnotes, disableFrontMatter, genPdf, verbose, debug;
+let overwrite, disableAttributes, disableFootnotes, disableFrontMatter, disableTaskLists, genPdf, verbose, debug;
 let headerFile, footerFile, pdfOptionsFile, keyrefFile;
 const extensionFiles = [];
 let tocJSON, tocXML, tocDepth;
@@ -71,6 +72,8 @@ process.argv.forEach(function (arg) {
     disableFootnotes = true;
   } else if (arg.indexOf(SWITCH_FRONTMATTER) === 0) {
     disableFrontMatter = true;
+  } else if (arg.indexOf(SWITCH_TASKLISTS) === 0) {
+    disableTaskLists = true;
   } else if (arg.indexOf(SWITCH_PDF) === 0) {
     genPdf = true;
   } else if (arg.indexOf(SWITCH_VERBOSE) === 0) {
@@ -149,6 +152,7 @@ if (help || !sourceDir || !destDir) {
     disableAttributes: disableAttributes,
     disableFootnotes: disableFootnotes,
     disableFrontMatter: disableFrontMatter,
+    disableTaskLists: disableTaskLists,
     generatePdf: genPdf,
     pdfOptionsFile: pdfOptionsFile,
     extensionFiles: extensionFiles,
