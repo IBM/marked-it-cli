@@ -2,6 +2,9 @@
 
 This project uses [semantic versioning](http://semver.org/).
 
+## [2.3.1] 2022-10-24
+Fix in variables resolution and updates to example/includesExt.js.
+
 ## [2.3.0] 2022-10-20
 Add support for generating task lists and add warnings for unresolved variables.
 
