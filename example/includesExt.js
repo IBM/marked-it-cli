@@ -261,31 +261,95 @@ toc.get = function (obj, data) {
 
 // Keyref processing
 function processKeyrefs(fileContent, data) {
-  const { fullpath_mdFilePath, globalKeyrefMapCopy } = data;
-
-  const clone_globalKeyrefMapCopy = _.merge({}, globalKeyrefMapCopy);
-  // Get file name and dir path
-  const baseDirName = path.dirname(fullpath_mdFilePath);
-  // Check for keyref.yaml and Process if available
+  const { sourceDirPath, mdFilePath, globalKeyrefMapCopy } = data;
   const FILENAME_KEYREF = 'keyref.yaml';
-  let keyrefPath = path.join(baseDirName, FILENAME_KEYREF);
-
   let localKeyrefMap = {site: {data: {}}};
+  let keyrefPath = null;
+  let loopKeyrefPath = false;
+  let currBaseDirName = null;
+  let mdStat = null;
 
-  // globalKeyrefMapCopy.site.data = JSON.parse(JSON.stringify(variables.site.data)); // Deep copy
-  let keyStore = {};
+  if(mdFilePath === '' || mdFilePath === '.') {
+    keyrefPath = path.join(sourceDirPath, FILENAME_KEYREF);
+  }
+
+  const baseDirName = path.dirname(mdFilePath);
+  if(baseDirName.trim().length !== 0) {
+    currBaseDirName = baseDirName;
+    loopKeyrefPath = true;
+  } else {
+    // If the file referring to current Dir then use default keyref, which will be processed by lib/mdProcessor.js
+    return fileContent;
+  }
 
   try {
-    // localKeyrefMap.site.data = jsYaml.safeLoad(common.readFile(fd));
-    localKeyrefMap.site.data = jsYaml.safeLoad(fse.readFileSync(keyrefPath));
-    // keyStore = _.merge(keyStore, localKeyrefMap.site.data, clone_globalKeyrefMapCopy.site.data);
-    keyStore = _.merge({}, localKeyrefMap.site.data);
-    keyStore = _.merge(keyStore, clone_globalKeyrefMapCopy.site.data);
+    /* Check if local keyref file exists,
+    * if not found move one level up and check recursively till nearest keyref file found
+    * In case we hit '../' in mdFilePath or exhaust the mddFilePath string then return from function
+    */
+    while(loopKeyrefPath) {
+      currBaseDirName = currBaseDirName.trim();
+      // Check empty string
+      if(currBaseDirName.length === 0) { 
+        // If the file referring to current Dir then use default keyref, which will be processed by lib/mdProcessor.js
+        return fileContent;
+      }
+      let dirArr = currBaseDirName.split(path.sep);
+      let lastIndex = dirArr.length - 1;
+  
+      if(dirArr.length === 0 || dirArr[lastIndex] === '..') {
+        // Return unchanged fileContent
+        return fileContent;
+      }
+  
+      let full_keyrefPath = path.join(sourceDirPath, currBaseDirName, FILENAME_KEYREF);
+      try {
+        mdStat = fse.statSync(full_keyrefPath);
+      } catch {
+        // Continue if file not found
+      }
+      if (mdStat && mdStat.isFile()) {
+        keyrefPath = full_keyrefPath;
+        // Stop the loop
+        loopKeyrefPath = false;
+      } else {
+        // Move the baseDir one level up
+        // NOTE: arr.slice(start, end) does not include end index
+        currBaseDirName = dirArr.slice(0, lastIndex).join(path.sep);
+      }
+    }
   } catch (e) {
-    // logger.warning("Failed to parse keyref file: " + keyrefPath + "\n" + e.toString());
+    // Something went wrong, Return unchanged fileContent
+    logger.info("Could not find nearest keyref file for " + mdFilePath);
+    return fileContent;
+  }
+
+  if(!keyrefPath) {
+    return fileContent;
+  }
+  
+  // Deep clone to avoid unintentional modification of globalKeyref
+  const clone_globalKeyrefMapCopy = _.merge({}, globalKeyrefMapCopy);
+  
+  try {
+    localKeyrefMap.site.data = jsYaml.safeLoad(fse.readFileSync(keyrefPath));
+  } catch {
+    // If loading keyref yaml file fails, log error and return
+    // Return unchanged fileContent if anything fails during keyref processing
+    logger.info(`Could not load yaml file ${keyrefPath} for ${mdFilePath}`);
+    return fileContent;
   }
 
   const re_keyref = /(\{\{)site.data.(.*)(\}\})/g;
+  let keyStore = {};
+
+  try {
+    keyStore = _.merge({}, localKeyrefMap.site.data);
+    keyStore = _.merge(keyStore, clone_globalKeyrefMapCopy.site.data);
+  } catch (e) {
+    // log error if merge failed
+    logger.info("Merge failed for global and included repo keyref for: " + mdFilePath);
+  }
 
   try {
     fileContent = fileContent.replace(re_keyref, (match, p1, p2, p3) => {
@@ -480,8 +544,9 @@ md.variables.add = function (obj, data) {
         }
       }
       fileContent = processKeyrefs(fileContent, {
-        fullpath_mdFilePath,
         globalKeyrefMapCopy,
+        sourceDirPath,
+        mdFilePath
       });
       // Process content for links(image)
       /* Function requires filecontent(string),
@@ -534,8 +599,9 @@ md.variables.add = function (obj, data) {
         }
       }
       fileContent = processKeyrefs(fileContent, {
-        fullpath_mdFilePath,
         globalKeyrefMapCopy,
+        sourceDirPath,
+        mdFilePath
       });
       // Update the results
       const modifiedFileContent = processImageLinks(
