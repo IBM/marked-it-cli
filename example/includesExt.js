@@ -831,6 +831,8 @@ md.variables.add = function (obj, data) {
       fileContent = processKeyrefs(fileContent, {
         fullpath_mdFilePath,
         globalKeyrefMapCopy,
+        sourceDirPath,
+        mdFilePath
       });
       // Process content for links(image)
       /* Function requires filecontent(string),
@@ -883,8 +885,9 @@ md.variables.add = function (obj, data) {
         }
       }
       fileContent = processKeyrefs(fileContent, {
-        fullpath_mdFilePath,
         globalKeyrefMapCopy,
+        sourceDirPath,
+        mdFilePath
       });
       // Update the results
       const modifiedFileContent = processImageLinks(
