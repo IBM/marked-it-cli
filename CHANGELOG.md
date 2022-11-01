@@ -2,6 +2,9 @@
 
 This project uses [semantic versioning](http://semver.org/).
 
+## [2.3.3] 2022-10-31
+Pick up the latest marked-it-core.
+
 ## [2.3.2] 2022-10-31
 Pick up the latest marked-it-core.
 
