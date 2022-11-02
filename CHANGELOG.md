@@ -3,7 +3,7 @@
 This project uses [semantic versioning](http://semver.org/).
 
 ## [2.3.3] 2022-10-31
-Pick up the latest marked-it-core.
+Pick up the latest marked-it-core and add support for bracket syntax for span tags, with a `--disable-spans` option to disable this new functionality on the command line.
 
 ## [2.3.2] 2022-10-31
 Pick up the latest marked-it-core.
