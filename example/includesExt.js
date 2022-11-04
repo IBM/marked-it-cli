@@ -76,20 +76,39 @@ function processImageMatch(match, p1, full_mdFilePath, destDir, inputDir) {
     // const img_filepath = match?.substring(start, end);
     const img_filepath = p1;
     let srcImagePath = path.resolve(`${srcFileDir}/${img_filepath}`);
-    let destImagePath = path.resolve(`${destDir}/${img_filepath}`);
-    let destImageDir = path.dirname(path.resolve(destImagePath));
-
+    // Check if matched regex is leading to valid file and it exists
+    let fileStat = null;
     try {
-      fse.ensureDirSync(destImageDir);
-      fse.copySync(srcImagePath, destImagePath);
-    } catch (err) {
-      logger.info(err)
+      fileStat = fse.statSync(srcImagePath);
+    } catch (e) {
+      // this file is not present, return
+      return match;
+    }
+    if (fileStat && fileStat.isFile()) {
+      let destImagePath = path.resolve(`${destDir}/${img_filepath}`);
+      let destImageDir = path.dirname(path.resolve(destImagePath));
+      try {
+        // Try to copy file to new location
+        try {
+          fse.ensureDirSync(destImageDir);
+          fse.copySync(srcImagePath, destImagePath);
+        } catch (err) {
+          // Failed to copy, log error and return
+          logger.info(err)
+          return match;
+        }
+        // Return new relative path for replacement
+        const relativePath = path.relative(inputDir, destImagePath);
+        const updated_match = match.slice(0, start) + relativePath + ')';
+        return updated_match;
+      } catch (e) {
+        // return unmodifiled if something goes wrong
+        return match;
+      }
     }
 
-    // Return new relative path for replacement
-    const relativePath = path.relative(inputDir, destImagePath);
-    const updated_match = match.slice(0, start) + relativePath + ')';
-    return updated_match;
+    // return if not a file
+    return match;
   }
 }
 
