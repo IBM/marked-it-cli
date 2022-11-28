@@ -1,0 +1,974 @@
+<html>
+
+<body>
+  <h1 id="test-for-marked-it-changes">Test cases for marked-it changes</h1>
+  <p class="shortdesc">This would be a short description for the first topic.</p>
+  <h2 id="animated-gif-css">Animated graphic</h2>
+  <p><img src="images/migration.mp4" alt="Migration of a Cloud Foundry service instance to a resource group" class="video" controls loop></p>
+  <h2 id="audio-css">Audio</h2>
+  <p><img src="https://watson-developer-cloud.github.io/doc-tutorial-downloads/text-to-speech/samples-neural/KevinV3.wav" alt="en-US_KevinV3Voice sample" class="audio" controls></p>
+  <p><img src="https://watson-developer-cloud.github.io/doc-tutorial-downloads/text-to-speech/samples-neural/KevinV3.wav" alt="en-US_KevinV3Voice sample" class="audio" controls style="width:250px;height:30px"></p>
+  <h2 id="code-highlighting-testing">Code highlighting testing</h2>
+  <p>The doc app uses highlight.js to add coloring to each of the code example snippets. The highlight.js supports a wide range of languages, as long as we have the right class name of language on the element. You can refer to their demo page at: <a href="https://highlightjs.org/static/demo/">https://highlightjs.org/static/demo/</a>.
+    We are using a custom theme based on Carbon-approved colors.</p>
+  <p>This feature is now part of Markdown source only. The highlighting &quot;tagging&quot; is now being added during the parser transforms to HTML 5.</p>
+  <p>If no language is indicated, default syntax highlighting should show...but might not be consistent across snippets. The list of supported values can be found here: <a href="https://github.com/highlightjs/highlight.js/blob/master/SUPPORTED_LANGUAGES.md">https://github.com/highlightjs/highlight.js/blob/master/SUPPORTED_LANGUAGES.md</a></p>
+  <p>To define a specific language class to a code snippet, add the defined language value immediately following the opening three ticks (```) of the code snippet.</p>
+  <p>Examples for testing the most popular languages follow.</p>
+  <h3 id="c">C++</h3>
+  <pre><code class="lang-c++ hljs"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;iostream&gt;</span></span>
+
+<span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">(<span class="hljs-type">int</span> argc, <span class="hljs-type">char</span> *argv[])</span> </span>{
+
+  <span class="hljs-comment">/* An annoying &quot;Hello World&quot; example */</span>
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">auto</span> i = <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">0xFFFF</span>; i++)
+    cout &lt;&lt; <span class="hljs-string">&quot;Hello, World!&quot;</span> &lt;&lt; endl;
+
+  <span class="hljs-type">char</span> c = <span class="hljs-string">&#x27;\n&#x27;</span>;
+  unordered_map &lt;string, vector&lt;string&gt; &gt; m;
+  m[<span class="hljs-string">&quot;key&quot;</span>] = <span class="hljs-string">&quot;\\\\&quot;</span>; <span class="hljs-comment">// this is an error</span>
+
+  <span class="hljs-keyword">return</span> <span class="hljs-number">-2e3</span> + <span class="hljs-number">12l</span>;
+}
+</code></pre>
+  <h3 id="go">Go</h3>
+  <pre><code class="lang-go hljs"><span class="hljs-keyword">type</span> Interface <span class="hljs-keyword">interface</span> {
+            Len() <span class="hljs-keyword">int</span>
+            Less(i, j <span class="hljs-keyword">int</span>) <span class="hljs-keyword">bool</span>
+            Swap(i, j <span class="hljs-keyword">int</span>)
+    }
+
+    <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">Sort</span><span class="hljs-params">(data Interface)</span></span> {
+            ...
+    }
+</code></pre>
+  <h3 id="java">Java</h3>
+  <pre><code class="lang-java hljs"><span class="hljs-type">Connection</span> <span class="hljs-variable">con</span> <span class="hljs-operator">=</span> <span class="hljs-literal">null</span>;
+<span class="hljs-keyword">try</span> {
+   Class.forName(<span class="hljs-string">&quot;com.ibm.db2.jcc.DB2Driver&quot;</span>);
+   <span class="hljs-type">String</span> <span class="hljs-variable">jdbcurl</span> <span class="hljs-operator">=</span>  (String) bludb.get(<span class="hljs-string">&quot;jdbcurl&quot;</span>); <span class="hljs-comment">// use ssljdbcurl to connect via SSL</span>
+   <span class="hljs-type">String</span> <span class="hljs-variable">user</span> <span class="hljs-operator">=</span> (String) bludb.get(<span class="hljs-string">&quot;username&quot;</span>);
+   <span class="hljs-type">String</span> <span class="hljs-variable">password</span> <span class="hljs-operator">=</span> (String) bludb.get(<span class="hljs-string">&quot;password&quot;</span>);
+   con = DriverManager.getConnection(jdbcurl, user,password);
+   con.setAutoCommit(<span class="hljs-literal">false</span>);
+} <span class="hljs-keyword">catch</span> (SQLException e) {
+   writer.println(<span class="hljs-string">&quot;SQL Exception: &quot;</span> + e);
+   <span class="hljs-keyword">return</span>;
+} <span class="hljs-keyword">catch</span> (ClassNotFoundException e) {
+   writer.println(<span class="hljs-string">&quot;ClassNotFound Exception: &quot;</span> + e);
+   <span class="hljs-keyword">return</span>;
+}
+<span class="hljs-type">Statement</span> <span class="hljs-variable">stmt</span> <span class="hljs-operator">=</span> <span class="hljs-literal">null</span>;
+<span class="hljs-type">String</span> <span class="hljs-variable">sqlStatement</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;&quot;</span>;
+<span class="hljs-keyword">try</span> {
+   stmt = con.createStatement();
+   sqlStatement = <span class="hljs-string">&quot;SELECT TABNAME,TABSCHEMA FROM SYSCAT.TABLES FETCH FIRST 10 ROWS ONLY&quot;</span>;
+   <span class="hljs-type">ResultSet</span> <span class="hljs-variable">rs</span> <span class="hljs-operator">=</span> stmt.executeQuery(sqlStatement);
+} <span class="hljs-keyword">catch</span> (SQLException e) {
+   writer.println(<span class="hljs-string">&quot;Error creating statement: &quot;</span> + e);
+}
+</code></pre>
+  <h3 id="node-javascript">Node (JavaScript)</h3>
+  <pre><code class="lang-javascript hljs"><span class="hljs-keyword">var</span> app = <span class="hljs-title function_">express</span>();
+
+<span class="hljs-comment">// all environments</span>
+app.<span class="hljs-title function_">set</span>(<span class="hljs-string">&#x27;port&#x27;</span>, process.<span class="hljs-property">env</span>.<span class="hljs-property">PORT</span> || <span class="hljs-number">3000</span>);
+...
+<span class="hljs-keyword">var</span> db2;
+
+<span class="hljs-keyword">var</span> env = <span class="hljs-variable constant_">JSON</span>.<span class="hljs-title function_">parse</span>(process.<span class="hljs-property">env</span>.<span class="hljs-property">VCAP_SERVICES</span>);
+db2 = env[<span class="hljs-string">&#x27;dashDB&#x27;</span>][<span class="hljs-number">0</span>].<span class="hljs-property">credentials</span>;
+
+<span class="hljs-keyword">var</span> connString = <span class="hljs-string">&quot;DRIVER={DB2};DATABASE=&quot;</span> + db2.<span class="hljs-property">db</span> + <span class="hljs-string">&quot;;UID=&quot;</span> + db2.<span class="hljs-property">username</span> + <span class="hljs-string">&quot;;PWD=&quot;</span> + db2.<span class="hljs-property">password</span> + <span class="hljs-string">&quot;;HOSTNAME=&quot;</span> + db2.<span class="hljs-property">hostname</span> + <span class="hljs-string">&quot;;port=&quot;</span> + db2.<span class="hljs-property">port</span>;
+
+app.<span class="hljs-title function_">get</span>(<span class="hljs-string">&#x27;/&#x27;</span>, routes.<span class="hljs-title function_">listSysTables</span>(ibmdb,connString));
+</code></pre>
+  <h3 id="php">PHP</h3>
+  <pre><code class="lang-php hljs"><span class="hljs-comment">// Parse VCAP</span>
+<span class="hljs-keyword">if</span>( getenv(<span class="hljs-string">&quot;VCAP_SERVICES&quot;</span>) ) {
+    <span class="hljs-variable">$json</span> = getenv(<span class="hljs-string">&quot;VCAP_SERVICES&quot;</span>);
+}
+<span class="hljs-comment">// No DB credentials</span>
+<span class="hljs-keyword">else</span> {
+    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Exception</span>(<span class="hljs-string">&quot;No Database Information Available.&quot;</span>, <span class="hljs-number">1</span>);
+}
+
+<span class="hljs-comment">// Decode JSON and gather DB Info</span>
+<span class="hljs-variable">$services_json</span> = json_decode(<span class="hljs-variable">$json</span>,<span class="hljs-literal">true</span>);
+<span class="hljs-variable">$bludb_config</span> = <span class="hljs-variable">$services_json</span>[<span class="hljs-string">&quot;dashDB&quot;</span>][<span class="hljs-number">0</span>][<span class="hljs-string">&quot;credentials&quot;</span>];
+
+<span class="hljs-comment">// Create DB connect string</span>
+<span class="hljs-variable">$conn_string</span> = <span class="hljs-string">&quot;DRIVER={IBM DB2 ODBC DRIVER};DATABASE=&quot;</span>.
+   <span class="hljs-variable">$bludb_config</span>[<span class="hljs-string">&quot;db&quot;</span>].
+   <span class="hljs-string">&quot;;HOSTNAME=&quot;</span>.
+   <span class="hljs-variable">$bludb_config</span>[<span class="hljs-string">&quot;host&quot;</span>].
+   <span class="hljs-string">&quot;;PORT=&quot;</span>.
+   <span class="hljs-variable">$bludb_config</span>[<span class="hljs-string">&quot;port&quot;</span>].
+   <span class="hljs-string">&quot;;PROTOCOL=TCPIP;UID=&quot;</span>.
+   <span class="hljs-variable">$bludb_config</span>[<span class="hljs-string">&quot;username&quot;</span>].
+   <span class="hljs-string">&quot;;PWD=&quot;</span>.
+   <span class="hljs-variable">$bludb_config</span>[<span class="hljs-string">&quot;password&quot;</span>].
+   <span class="hljs-string">&quot;;&quot;</span>;
+</code></pre>
+  <h3 id="python">Python</h3>
+  <pre><code class="lang-python hljs"><span class="hljs-keyword">import</span> json
+vcap_services = json.loads(os.environ[<span class="hljs-string">&#x27;VCAP_SERVICES&#x27;</span>])
+service = vcap_services[<span class="hljs-string">&#x27;dashDB&#x27;</span>][<span class="hljs-number">0</span>]
+credentials = service[<span class="hljs-string">&quot;credentials&quot;</span>]
+url = <span class="hljs-string">&#x27;DATABASE=%s;uid=%s;pwd=%s;hostname=%s;port=%s;&#x27;</span> % ( credentials[<span class="hljs-string">&quot;db&quot;</span>],credentials[<span class="hljs-string">&quot;username&quot;</span>],credentials[<span class="hljs-string">&quot;password&quot;</span>],credentials[<span class="hljs-string">&quot;host&quot;</span>],credentials[<span class="hljs-string">&quot;port&quot;</span>])
+</code></pre>
+  <h3 id="ruby">Ruby</h3>
+  <pre><code class="lang-ruby hljs"><span class="hljs-keyword">if</span> conn = IBM_DB.connect(dsn, <span class="hljs-string">&#x27;&#x27;</span>, <span class="hljs-string">&#x27;&#x27;</span>)
+    sql = <span class="hljs-string">&quot;SELECT FIRST_NAME, LAST_NAME from GOSALESHR.employee FETCH FIRST 10 ROWS ONLY&quot;</span>
+    <span class="hljs-keyword">if</span> stmt = IBM_DB.exec(conn, sql)
+       total = total + sql + <span class="hljs-string">&quot;&lt;BR&gt;&lt;BR&gt;\n&quot;</span>
+    <span class="hljs-keyword">else</span>
+      out = <span class="hljs-string">&quot;Statement execution failed: <span class="hljs-subst">#{IBM_DB.stmt_errormsg}</span>&quot;</span>
+      total = total + out + <span class="hljs-string">&quot;&lt;BR&gt;\n&quot;</span>
+    <span class="hljs-keyword">end</span>
+  <span class="hljs-keyword">end</span>
+</code></pre>
+  <h3 id="sql">SQL</h3>
+  <pre><code class="lang-sql hljs"><span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">TABLE</span> &quot;topic&quot; (
+    &quot;id&quot; serial <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">NULL</span> <span class="hljs-keyword">PRIMARY</span> KEY,
+    &quot;forum_id&quot; <span class="hljs-type">integer</span> <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">NULL</span>,
+    &quot;subject&quot; <span class="hljs-type">varchar</span>(<span class="hljs-number">255</span>) <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">NULL</span>
+);
+<span class="hljs-keyword">ALTER</span> <span class="hljs-keyword">TABLE</span> &quot;topic&quot;
+<span class="hljs-keyword">ADD</span> <span class="hljs-keyword">CONSTRAINT</span> forum_id <span class="hljs-keyword">FOREIGN</span> KEY (&quot;forum_id&quot;)
+<span class="hljs-keyword">REFERENCES</span> &quot;forum&quot; (&quot;id&quot;);
+
+<span class="hljs-comment">-- Initials</span>
+<span class="hljs-keyword">insert</span> <span class="hljs-keyword">into</span> &quot;topic&quot; (&quot;forum_id&quot;, &quot;subject&quot;)
+<span class="hljs-keyword">values</span> (<span class="hljs-number">2</span>, <span class="hljs-string">&#x27;D&#x27;&#x27;artagnian&#x27;</span>);
+</code></pre>
+  <h3 id="swift">Swift</h3>
+  <pre><code class="lang-swift hljs"><span class="hljs-keyword">import</span> Kitura
+
+<span class="hljs-keyword">let</span> router <span class="hljs-operator">=</span> <span class="hljs-type">Router</span>()
+router.get(<span class="hljs-string">&quot;/&quot;</span>) {
+     request, response, next <span class="hljs-keyword">in</span>
+     response.send(<span class="hljs-string">&quot;Hello, Server Side Swift&quot;</span>)
+     next()
+}
+<span class="hljs-type">Kitura</span>.addHTTPServer(onPort: <span class="hljs-number">8090</span>, with: router)
+<span class="hljs-type">Kitura</span>.run()
+</code></pre>
+  <h3 id="yaml">YAML</h3>
+  <pre><code class="lang-yaml hljs"><span class="hljs-meta">---</span>
+<span class="hljs-comment"># comment</span>
+<span class="hljs-attr">string_1:</span> <span class="hljs-string">&quot;Bar&quot;</span>
+<span class="hljs-attr">string_2:</span> <span class="hljs-string">&#x27;bar&#x27;</span>
+<span class="hljs-attr">string_3:</span> <span class="hljs-string">bar</span>
+<span class="hljs-attr">inline_keys_ignored:</span> <span class="hljs-string">sompath/name/file.jpg</span>
+<span class="hljs-attr">keywords_in_yaml:</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-literal">true</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-literal">false</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-literal">TRUE</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-literal">FALSE</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-number">21</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-number">21.0</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-type">!!str</span> <span class="hljs-number">123</span>
+<span class="hljs-attr">&quot;quoted_key&quot;:</span> <span class="hljs-meta">&amp;foobar</span>
+  <span class="hljs-attr">bar:</span> <span class="hljs-string">foo</span>
+  <span class="hljs-attr">foo:</span>
+  <span class="hljs-attr">&quot;foo&quot;:</span> <span class="hljs-string">bar</span>
+
+<span class="hljs-attr">reference:</span> <span class="hljs-meta">*foobar</span>
+
+<span class="hljs-attr">multiline_1:</span> <span class="hljs-string">|
+  Multiline
+  String
+</span><span class="hljs-attr">multiline_2:</span> <span class="hljs-string">&gt;
+  Multiline
+  String
+</span><span class="hljs-attr">multiline_3:</span> <span class="hljs-string">&quot;
+  Multiline string
+  &quot;</span>
+
+<span class="hljs-attr">ansible_variables:</span> <span class="hljs-string">&quot;foo <span class="hljs-template-variable">{{variable}}</span>&quot;</span>
+
+<span class="hljs-attr">array_nested:</span>
+<span class="hljs-bullet">-</span> <span class="hljs-string">a</span>
+<span class="hljs-bullet">-</span> <span class="hljs-attr">b:</span> <span class="hljs-number">1</span>
+  <span class="hljs-attr">c:</span> <span class="hljs-number">2</span>
+<span class="hljs-bullet">-</span> <span class="hljs-string">b</span>
+<span class="hljs-bullet">-</span> <span class="hljs-string">comment</span>
+</code></pre>
+  <h3 id="bash">Bash</h3>
+  <pre><code class="lang-bash hljs"><span class="hljs-meta">#!/bin/bash</span>
+
+<span class="hljs-comment">###### CONFIG</span>
+ACCEPTED_HOSTS=<span class="hljs-string">&quot;/root/.hag_accepted.conf&quot;</span>
+BE_VERBOSE=<span class="hljs-literal">false</span>
+
+<span class="hljs-keyword">if</span> [ <span class="hljs-string">&quot;<span class="hljs-variable">$UID</span>&quot;</span> -ne 0 ]
+<span class="hljs-keyword">then</span>
+ <span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;Superuser rights required&quot;</span>
+ <span class="hljs-built_in">exit</span> 2
+<span class="hljs-keyword">fi</span>
+
+<span class="hljs-function"><span class="hljs-title">genApacheConf</span></span>(){
+ <span class="hljs-built_in">echo</span> -e <span class="hljs-string">&quot;# Host <span class="hljs-variable">${HOME_DIR}</span><span class="hljs-variable">$1</span>/<span class="hljs-variable">$2</span> :&quot;</span>
+}
+
+<span class="hljs-built_in">echo</span> <span class="hljs-string">&#x27;&quot;quoted&quot;&#x27;</span> | tr -d \&quot; &gt; text.txt
+</code></pre>
+  <pre><code class="lang-sh hljs"><span class="hljs-meta">#!/bin/bash</span>
+
+<span class="hljs-comment">###### CONFIG</span>
+ACCEPTED_HOSTS=<span class="hljs-string">&quot;/root/.hag_accepted.conf&quot;</span>
+BE_VERBOSE=<span class="hljs-literal">false</span>
+
+<span class="hljs-keyword">if</span> [ <span class="hljs-string">&quot;<span class="hljs-variable">$UID</span>&quot;</span> -ne 0 ]
+<span class="hljs-keyword">then</span>
+ <span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;Superuser rights required&quot;</span>
+ <span class="hljs-built_in">exit</span> 2
+<span class="hljs-keyword">fi</span>
+
+<span class="hljs-function"><span class="hljs-title">genApacheConf</span></span>(){
+ <span class="hljs-built_in">echo</span> -e <span class="hljs-string">&quot;# Host <span class="hljs-variable">${HOME_DIR}</span><span class="hljs-variable">$1</span>/<span class="hljs-variable">$2</span> :&quot;</span>
+}
+
+<span class="hljs-built_in">echo</span> <span class="hljs-string">&#x27;&quot;quoted&quot;&#x27;</span> | tr -d \&quot; &gt; text.txt
+</code></pre>
+  <h3 id="shell">Shell</h3>
+  <pre><code class="lang-shell hljs"><span class="hljs-meta">$ </span><span class="language-bash"><span class="hljs-built_in">echo</span> <span class="hljs-variable">$EDITOR</span></span>
+</code></pre>
+  <pre><code class="lang-shell hljs"><span class="hljs-meta">$ </span><span class="language-bash">curl -X POST \
+<span class="hljs-string">&quot;https://anvil.cloud.ibm.com/v1/anvils \
+-H &quot;</span>Authorization: Bearer &lt;IAM_Token&gt;<span class="hljs-string">&quot; \
+-H &#x27;Content-Type: application/json&#x27; \
+-d &#x27;{</span></span>
+  &quot;source_account_id&quot;: &quot;a1b2c32a5ea94809a9840f5e23c362d&quot;,
+  &quot;name&quot;: &quot;Sample Anvil&quot;,
+  &quot;domain&quot;: &quot;example.com&quot;,
+  &quot;primary_contact_iam_id&quot;: &quot;IBMid-0123ABC&quot;
+}&#x27;
+</code></pre>
+  <pre><code class="lang-shell hljs"><span class="hljs-meta">$ </span><span class="language-bash">docker run \
+      --publish=7474:7474 --publish=7687:7687 \
+      --volume=/neo4j/data:/data \
+      --volume=/neo4j/plugins:/plugins \
+      --volume=/neo4j/conf:/conf \
+      --volume=/logs/neo4j:/logs \
+      --user=<span class="hljs-string">&quot;<span class="hljs-subst">$(id -u neo4j)</span>:<span class="hljs-subst">$(id -g neo4j)</span>&quot;</span> \
+      --group-add=<span class="hljs-variable">$groups</span> \
+      neo4j:3.4</span>
+</code></pre>
+  <h2 id="code-styling-testing">Code styling testing</h2>
+  <pre><code class="hljs">This is a block of code
+</code></pre>
+  <p><code>This is a code phrase</code></p>
+  <h2 id="definition-list-test">Definition list</h2>
+  <dl>
+    <dt id="test-def-anchor1">Apple</dt>
+    <dd>
+      <p>Pomaceous fruit of plants of the genus Malus in the family Rosaceae.</p>
+    </dd>
+    <dd>
+      <p>An American computer company.</p>
+    </dd>
+    <dt>Orange</dt>
+    <dd>
+      <p id="test-def-anchor1">The fruit of an evergreen tree of the genus Citrus.</p>
+      <p>You can peel it and eat it and enjoy it.</p>
+    </dd>
+    <dt>Banana</dt>
+    <dd>
+      <p>Starchy long fruits. Technically an herb? They are:</p>
+      <ul>
+        <li id="banana-facts">Long</li>
+        <li>Kinda beige</li>
+        <li>Varying degrees of squishy</li>
+      </ul>
+      <p>Also, they have a <code>yellow</code> peel. Share your love for bananas from the command line:</p>
+      <pre><code class="lang-sh hljs"><span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;I like bananas!
+</span></code></pre>
+    </dd>
+    <dt>Prune</dt>
+    <dd>
+      <p>High fiber, questionably tasty dried plum.</p>
+    </dd>
+  </dl>
+  <h2 id="footnotes-test">Footnotes</h2>
+  <p>When a <code>PUT</code> request is successfully and synchronously used to replace an existing resource, a status of <code>200</code><sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup> OK MUST be returned.</p>
+  <p>Simple table:</p>
+  <table caption="Table 1. Account features" caption-side="bottom">
+    <thead>
+      <tr>
+        <th></th>
+        <th>Lite</th>
+        <th>Pay-As-You-Go</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Free Cloud Foundry memory <sup class="footnote-ref"><a href="#fn2" id="fnref2">[2]</a></sup></strong></td>
+        <td>256 MB</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><strong>Free community buildpacks <sup class="footnote-ref"><a href="#fn3" id="fnref3">[3]</a></sup></strong></td>
+        <td>186 GBH</td>
+        <td>186 GBH</td>
+      </tr>
+      <tr>
+        <td><strong>Access to Lite service plans</strong></td>
+        <td><img src="../icons/icon_enabled.svg" alt="Feature available"></td>
+        <td><img src="../icons/icon_enabled.svg" alt="Feature available"></td>
+      </tr>
+      <tr>
+        <td><strong>Access to all free plans</strong></td>
+        <td></td>
+        <td><img src="../icons/icon_enabled.svg" alt="Feature available"></td>
+      </tr>
+    </tbody>
+  </table>
+  <p>Comparison table:</p>
+  <table class="row-headers comparison-table" caption="Table comparison. Americas infrastructure availability" caption-side="bottom" summary="This table has row and column headers. The row headers identify the service. The column headers identify where that service is located. To understand where a service is located in the table, navigate to the row, and find the for the location you are interested in.">
+    <thead>
+      <tr>
+        <th>Service</th>
+        <th>Dallas 01</th>
+        <th>Dallas 05</th>
+        <th>Dallas 06</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Bare Metal Server</td>
+        <td><img src="../icons/checkmark-icon.svg" alt="Checkmark icon"></td>
+        <td><img src="../icons/checkmark-icon.svg" alt="Checkmark icon"></td>
+        <td><img src="../icons/checkmark-icon.svg" alt="Checkmark icon"></td>
+      </tr>
+      <tr>
+        <td>Block Storage</td>
+        <td><img src="../icons/checkmark-icon.svg" alt="Checkmark icon"></td>
+        <td><img src="../icons/checkmark-icon.svg" alt="Checkmark icon"></td>
+        <td><img src="../icons/checkmark-icon.svg" alt="Checkmark icon"><sup class="footnote-ref"><a href="#fn4" id="fnref4">[4]</a></sup></td>
+      </tr>
+      <tr>
+        <td>Citrix NetScaler<sup class="footnote-ref"><a href="#fn5" id="fnref5">[5]</a></sup> VPX</td>
+        <td><img src="../icons/checkmark-icon.svg" alt="Checkmark icon"></td>
+        <td><img src="../icons/checkmark-icon.svg" alt="Checkmark icon"></td>
+        <td><img src="../icons/checkmark-icon.svg" alt="Checkmark icon"></td>
+      </tr>
+    </tbody>
+  </table>
+  <p>Ordered list:</p>
+  <ol>
+    <li>This is the first item, and <code>this phrase</code> should be highlighted.<sup class="footnote-ref"><a href="#fn6" id="fnref6">[6]</a></sup>
+      <ol>
+        <li>This is a nested item and surrounded by bold <strong><code>this is another phrase</code></strong> that should be highlighted and <strong>bold</strong>.</li>
+        <li>This is a second nested item surrounded by italics and <em><code>this is yet another phrase</code></em> that should be highlighted and <em>italicized</em>.<sup class="footnote-ref"><a href="#fn7" id="fnref7">[7]</a></sup></li>
+      </ol>
+    </li>
+    <li>This is the second<sup class="footnote-ref"><a href="#fn8" id="fnref8">[8]</a></sup> item and <code>I get highlighted</code>.</li>
+  </ol>
+  <p>Unordered list:</p>
+  <ul>
+    <li>bullet <code>1</code><sup class="footnote-ref"><a href="#fn9" id="fnref9">[9]</a></sup>
+      <ul>
+        <li>sub-bullet <strong><code>1.1 bold</code></strong></li>
+        <li>sub-bullet <em><code>1.2 highlight</code></em><sup class="footnote-ref"><a href="#fn10" id="fnref10">[10]</a></sup></li>
+      </ul>
+    </li>
+    <li>bullet <code>2</code></li>
+  </ul>
+  <h2 id="headings">Headings test</h2>
+  <h3 id="headings-h3">H3 Heading</h3>
+  <p>Test for H3 heading.</p>
+  <h4 id="headings-h4">H4 Heading</h4>
+  <p>Test for H4 heading.</p>
+  <h5 id="headings-h5">H5 Heading</h5>
+  <p>Test for H5 heading.</p>
+  <h6 id="headings-h6">H6 Heading</h6>
+  <p>Test for H6 heading.</p>
+  <h2 id="image-wrapped-in-figure-tag">Image wrapped in figure tag</h2>
+  <p>By adding a caption to the image (attribute must be on the same line), you can wrap the image in a figure tag and produce a clean caption inside the <code>figcaption</code> tag. This will allow for better image figure captions with consistent wrapping
+    in the doc app.</p>
+  <p important>The markdown source caption attribute must be on the same line as the image, directly follwing the closing parentheses of the image link. Additionally, you must specify <code>caption-side=&quot;bottom&quot;</code> to ensure that <code>marked-it-cli</code>    will print the <code>figcaption</code> tag below the <code>img</code> tag.</p>
+  <p><img src="build/images/toc-metadata.png" alt="End to end build" caption="Figure 1. A surprisingly tart visual that explains each Table of Contents metadata value." caption-side="bottom"></p>
+  <h2 id="inline-tagging-styling-testing">Inline tagging styling testing</h2>
+  <p>The <strong>cmdname</strong> should output as bold inline text.</p>
+  <p>The <em>varname</em> should output as italized inline text.</p>
+  <p>The <code>option</code> should output as monospaced inline text.</p>
+  <p>The following demonstrates a parameter list. It should contain a bold title with a description on the following line:
+    <strong>title 1</strong> definition 1</p>
+  <pre><code class="hljs">**title 2**
+definition 2
+
+**title 3**
+definition
+</code></pre>
+  <p>The <strong>uicontrol</strong> should output as bold inline text.</p>
+  <p>The <code>apiname</code> should output as monospaced inline text.</p>
+  <p>The <code>filepath</code> should output as monospaced inline text.</p>
+  <h3 id="inline-code-styling">Inline <code>code</code> styling</h3>
+  <p>Validating the use of backticks to highlight a string of code inline rather than in block in different elements:</p>
+  <h4 id="nesting-bold-and-italics">Nesting bold and italics</h4>
+  <p>We want to be able to nest bold values or italic values within a code phrase that has been highlighted within <code>&lt;code&gt;</code>:</p>
+  <p>This should have bold around the world <strong>tenemos</strong> in this code phrase: <code>nostros **tenemos** mas influencia</code>.</p>
+  <p>This should have bold around the world <em>tenemos</em> in this code phrase: <code>nostros _tenemos_ mas influencia</code>.</p>
+  <h4 id="block-elements">Block elements</h4>
+  <p>This is a paragraph and <code>this should be higlighted</code> within that paragraph. This next line has a phrase that is highlighted and bold: <strong><code>this is code surrounded by bold</code></strong>, <code>**this is bold surrounded by code**</code>.
+    This next line has italics and code highlights: <em><code>this is code surrounded by italics</code></em>, and <code>*this is italics surrounded by code*</code>.</p>
+  <p>This next line has links with code. This is a link <a href="www.cloud.ibm.com">Cloud is amazing</a>. This is a link surrounded by code highlights: <code>[Cloud is amazing](www.cloud.ibm.com)</code>. Bold code link: <strong><code>[Cloud is amazing](www.cloud.ibm.com)</code></strong>.
+    Italics code link: <em><code>[Cloud is amazing](www.cloud.ibm.com)</code></em>.</p>
+  <h4 id="list-elements">List elements</h4>
+  <p>Ordered List:</p>
+  <ol>
+    <li>
+      <p>This is the first item, and <code>this phrase</code> should be highlighted.</p>
+      <ol>
+        <li>This is a nested item and surrounded by bold <strong><code>this is another phrase</code></strong> that should be highlighted and <strong>bold</strong>.</li>
+        <li>This is a second nested item surrounded by italics and <em><code>this is yet another phrase</code></em> that should be highlighted and <em>italicized</em>.</li>
+      </ol>
+    </li>
+    <li>
+      <p>This is the second item and <code>I get highlighted</code>.</p>
+    </li>
+    <li>
+      <p>This is a third item with a code block.</p>
+      <pre><code class="lang-python hljs"><span class="hljs-comment"># Python example</span>
+message = <span class="hljs-string">&#x27;Hello, world!&#x27;</span>
+
+<span class="hljs-built_in">print</span>(message)
+</code></pre>
+    </li>
+    <li>
+      <p>This is a fourth item.</p>
+    </li>
+  </ol>
+  <p>Unordered List:</p>
+  <ul>
+    <li>
+      <p>bullet <code>1</code></p>
+      <ul>
+        <li>sub-bullet <strong><code>1.1 bold</code></strong></li>
+        <li>sub-bullet <em><code>1.2 highlight</code></em></li>
+      </ul>
+    </li>
+    <li>
+      <p>bullet <code>2</code></p>
+    </li>
+    <li>
+      <p>bullet <code>3</code></p>
+      <pre><code class="lang-python hljs"><span class="hljs-comment"># Python example</span>
+message = <span class="hljs-string">&#x27;Hello, world!&#x27;</span>
+
+<span class="hljs-built_in">print</span>(message)
+</code></pre>
+    </li>
+  </ul>
+  <p>Another example:</p>
+  <ol>
+    <li>
+      <p>Check the VLANs that are available in your cluster.</p>
+      <pre><code class="lang-sh hljs">cluster get --cluster &lt;cluster_name_or_ID&gt; --show-resources
+</code></pre>
+      <p>Example output:</p>
+      <pre><code class="lang-text hljs">VLAN ID   Subnet CIDR         Public   User-managed
+229xxxx   169.xx.xxx.xxx/29   true     false
+229xxxx   10.xxx.xx.x/29      false    false
+</code></pre>
+    </li>
+    <li>
+      <p>This is another list item.</p>
+    </li>
+    <li>
+      <p>Also so is this.</p>
+    </li>
+  </ol>
+  <h2 id="link-testing">Link testing</h2>
+  <h3 id="anchor-links">Anchor links</h3>
+  <ul>
+    <li><a href="#strong1">Link to strong1</a></li>
+    <li><a href="#strong2">Link to strong2</a></li>
+    <li><a href="#emphasized1">Link to emphasized1</a></li>
+    <li><a href="#emphasized2">Link to emphasized2</a></li>
+    <li><a href="#codeblock-anchor">Link to codeblock-anchor</a></li>
+    <li><a href="#codedspan">Link to codespan</a></li>
+    <li><a href="#link1">Link to link</a></li>
+    <li><a href="#paragraph1">Link to paragraph1</a></li>
+    <li><a href="#anchor-list-item1">Link to ordered list item</a></li>
+    <li><a href="#ordered-list1">Link to ordered list</a></li>
+    <li><a href="#anchor-list-item2">Link to unordered list item</a></li>
+    <li><a href="#unordered-list1">Link to unordered list</a></li>
+    <li><a href="#table-anchor">Link to table</a></li>
+  </ul>
+  <p>This paragraph contains <strong id="strong1">strong text with anchor 1</strong> and <strong id="strong2">strong text with anchor 2</strong>. It also contains <em id="emphasized1">emphasized text with anchor 1</em> and <em id="emphasized2">emphasized text with anchor 2</em>.</p>
+  <pre id="codeblock-anchor"><code class="hljs">This is a code block with an anchor.
+</code></pre>
+  <p id="paragraph1">This paragraph contains a <code id="codespan">code span with anchor</code>, a <a href="https://www.github.com" id="link1">link to github</a></p>
+  <ol id="ordered-list">
+    <li id="anchor-list-item1">An ordered list item with a <s>strikethrough</s></li>
+    <li>Another ordered list items.</li>
+    <li>Another ordered list item.</li>
+  </ol>
+  <ul id="unordered-list">
+    <li id="anchor-list-item2">an unordered list item</li>
+    <li>an unordered list item with an <img src="%22./non-existent-image.png%22" alt="image" title="a title" id="image1"></li>
+    <li>another unordered list item</li>
+  </ul>
+  <table id="table-anchor">
+    <thead>
+      <tr>
+        <th>Header 1</th>
+        <th>Header 2</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Column 1</td>
+        <td>Column 2</td>
+      </tr>
+    </tbody>
+  </table>
+  <h2 id="lists">Lists</h2>
+  <h3 id="ordered-lists">Ordered lists</h3>
+  <ol>
+    <li>
+      <p>This is a list item.</p>
+      <ol>
+        <li>This is a nested ordered list item.</li>
+        <li>This is a nested ordered list item.</li>
+        <li>This is a nested ordered list item.</li>
+      </ol>
+    </li>
+    <li>
+      <p>This is a list item.</p>
+      <ul>
+        <li>This is a nested unordered list item.</li>
+        <li>This is a nested unordered list item.</li>
+        <li>This is a nested unordered list item.</li>
+      </ul>
+    </li>
+    <li>
+      <p>This is a list item.</p>
+      <p>This is a paragraph under a list item.</p>
+    </li>
+    <li>
+      <p>This is a list item.</p>
+      <pre><code class="lang-sh hljs">code block
+</code></pre>
+    </li>
+    <li>
+      <p>This is a list item.</p>
+    </li>
+  </ol>
+  <h3 id="unordered-lists">Unordered lists</h3>
+  <p>This is a list that uses <code>-</code>.</p>
+  <ul>
+    <li>
+      <p>This is a list item.</p>
+      <ol>
+        <li>This is a nested ordered list item.</li>
+        <li>This is a nested ordered list item.</li>
+        <li>This is a nested ordered list item.</li>
+      </ol>
+    </li>
+    <li>
+      <p>This is a list item.</p>
+      <ul>
+        <li>This is a nested unordered list item.</li>
+        <li>This is a nested unordered list item.</li>
+        <li>This is a nested unordered list item.</li>
+      </ul>
+    </li>
+    <li>
+      <p>This is a list item.</p>
+      <p>This is a paragraph under a list item.</p>
+    </li>
+    <li>
+      <p>This is a list item.</p>
+      <pre><code class="lang-sh hljs">code block
+</code></pre>
+    </li>
+    <li>
+      <p>This is a list item.</p>
+    </li>
+  </ul>
+  <p>This is a list that uses <code>*</code>.</p>
+  <ul>
+    <li>
+      <p>This is a list item.</p>
+      <ol>
+        <li>This is a nested ordered list item.</li>
+        <li>This is a nested ordered list item.</li>
+        <li>This is a nested ordered list item.</li>
+      </ol>
+    </li>
+    <li>
+      <p>This is a list item.</p>
+      <ul>
+        <li>This is a nested unordered list item.</li>
+        <li>This is a nested unordered list item.</li>
+        <li>This is a nested unordered list item.</li>
+      </ul>
+    </li>
+    <li>
+      <p>This is a list item.</p>
+      <p>This is a paragraph under a list item.</p>
+    </li>
+    <li>
+      <p>This is a list item.</p>
+      <pre><code class="lang-sh hljs">code block
+</code></pre>
+    </li>
+    <li>
+      <p>This is a list item.</p>
+    </li>
+  </ul>
+  <h3 id="mi-20-list-item-attributes">Attribute on list item</h3>
+  <ol>
+    <li>This is a list item.</li>
+    <li id="yay-list-item-anchors">This is a list item with an anchor.</li>
+    <li>This is a list item <em id="i-like-list-items">with an anchor and no space</em></li>
+    <li id="i-like-list-items">This is a list item <em>with an anchor</em></li>
+    <li>This is a list item with an <a href="https://cloud.ibm.com" external>external link</a></li>
+    <li>This is a list item with an <a href="https://cloud.ibm.com" python>external link</a></li>
+    <li python>This is a list item with an <a href="https://cloud.ibm.com">external link</a></li>
+    <li>This is a list item with an <a href="https://cloud.ibm.com" external python>external link</a></li>
+    <li python>This is a list item with an <a href="https://cloud.ibm.com" external>external link</a></li>
+    <li python>This is a list item with an <a href="https://cloud.ibm.com" external>external link</a>.</li>
+  </ol>
+  <h2 id="quotations">Quotations</h2>
+  <p>&quot;This is a quote with quotation marks.&quot;</p>
+  <p><q>This is a quote using HTML q tags.</q></p>
+  <h2 id="superscript">Superscript</h2>
+  <p>This is a test to see if subscript works...</p>
+  <p>19<sup>th</sup></p>
+  <h2 id="subscript">Subscript</h2>
+  <p>This is a test to see if superscript works...</p>
+  <p>H<sub>2</sub>O</p>
+  <h2 id="tables">Tables</h2>
+  <h3 id="comparison-table-test">Comparison table</h3>
+  <table class="row-headers comparison-table" caption="Table comparison. Americas infrastructure availability" caption-side="bottom" summary="This table has row and column headers. The row headers identify the service. The column headers identify where that service is located. To understand where a service is located in the table, navigate to the row, and find the for the location you are interested in.">
+    <thead>
+      <tr>
+        <th>Service</th>
+        <th>Dallas 01</th>
+        <th>Dallas 05</th>
+        <th>Dallas 06</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Bare Metal Server</td>
+        <td><img src="../icons/checkmark-icon.svg" alt="Checkmark icon"></td>
+        <td><img src="../icons/checkmark-icon.svg" alt="Checkmark icon"></td>
+        <td><img src="../icons/checkmark-icon.svg" alt="Checkmark icon"></td>
+      </tr>
+      <tr>
+        <td>Block Storage</td>
+        <td><img src="../icons/checkmark-icon.svg" alt="Checkmark icon"></td>
+        <td></td>
+        <td><img src="../icons/checkmark-icon.svg" alt="Checkmark icon"></td>
+      </tr>
+      <tr>
+        <td>Citrix NetScaler VPX</td>
+        <td><img src="../icons/checkmark-icon.svg" alt="Checkmark icon"></td>
+        <td><img src="../icons/checkmark-icon.svg" alt="Checkmark icon"></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="complex-table-test">Complex table</h3>
+  <table class="row-headers" caption="Table 1. Example platform management roles and actions for services in an account" caption-side="bottom" summary="The first row of the table describes separate options that you can choose from when creating a policy, and the first column describes the selected roles for the policy. The remaining cells map to the selected role from the first column, and to the selected policy from the first row to describe how the roles apply in each context."
+    id="platformrolestable1">
+    <thead>
+      <tr>
+        <th></th>
+        <th>One or all IAM-enabled services</th>
+        <th>Selected service in a resource group</th>
+        <th>Resource group access</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Viewer role</td>
+        <td>View instances, aliases, bindings, and credentials</td>
+        <td>View only specified instances in the resource group</td>
+        <td>View resource group</td>
+      </tr>
+      <tr>
+        <td>Operator role</td>
+        <td>View instances and manage aliases, bindings, and credentials</td>
+        <td>Not applicable</td>
+        <td>Not applicable</td>
+      </tr>
+      <tr>
+        <td>Editor role</td>
+        <td>Create, delete, edit, and view instances. Manage aliases, bindings, and credentials</td>
+        <td>Create, delete, edit, suspend, resume, view, and bind only specified instances in the resource group</td>
+        <td>View and edit name of resource group</td>
+      </tr>
+      <tr>
+        <td>Administrator role</td>
+        <td>All management actions for services</td>
+        <td>All management actions for the specified instances in the resource group</td>
+        <td>View, edit, and manage access for the resource group</td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="simple-table-test">Simple table</h3>
+  <table caption="Table 1. Users allowed to create access policies" caption-side="bottom">
+    <thead>
+      <tr>
+        <th>Action</th>
+        <th>Required Role</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Create a policy in an account for all services and instances</td>
+        <td>Account owner or administrator on all account management services and all Identity and Access enabled services</td>
+      </tr>
+      <tr>
+        <td>Create a policy on a service in an account</td>
+        <td>Account owner, administrator on all Identity and Access enabled services, or administrator on the service in the account</td>
+      </tr>
+      <tr>
+        <td>Create a policy on a service instance</td>
+        <td>Account owner, administrator on all Identity and Access enabled services, administrator on the service in the account, administrator on all services in the relevant resource group, or administrator on the service instance</td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="tables-lists">New lines, paragraphs, and lists in tables</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Header</th>
+        <th>Header</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Single line break</td>
+        <td>This is a cell with a new line.<br>
+          <code>This is a separate line</code>.</td>
+      </tr>
+      <tr>
+        <td>Double line break</td>
+        <td>This is a cell with two new lines.
+          <p></p>
+          <p><em>This is a separate line</em>.</p>
+        </td>
+      </tr>
+      <tr>
+        <td>Unordered lists (asterisks)</td>
+        <td>
+          <ul>
+            <li>This is a list item</li>
+            <li><strong>This is a list item</strong></li>
+            <li>This is a list item</li>
+          </ul>
+        </td>
+      </tr>
+      <tr>
+        <td>Unordered lists (hyphens)</td>
+        <td>
+          <ul>
+            <li>This is a list item</li>
+            <li>This is a list item with <code>code &lt;variable&gt;</code></li>
+            <li>This is a list item</li>
+          </ul>
+        </td>
+      </tr>
+      <tr>
+        <td>Ordered lists</td>
+        <td>
+          <ol>
+            <li>This is a list item</li>
+            <li><em>This is a list item</em></li>
+            <li>This is a list item</li>
+          </ol>
+        </td>
+      </tr>
+      <tr>
+        <td>Code block</td>
+        <td><code>  sh iks cluster get --cluster  </code></td>
+      </tr>
+      <tr>
+        <td>Pipe in a table</td>
+        <td>| or <code>&amp;#124;</code>... Does this `</td>
+      </tr>
+      <tr>
+        <td>{: caption=&quot;Table 1. A cool table for testing <code>markdown</code> code.&quot; caption-side=&quot;bottom&quot; #my-cool-table}</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="mi-20-lists-tables">Tables in lists</h3>
+  <p>This is an ordered list:</p>
+  <ol>
+    <li>
+      <p>This is a step with a simple table.</p>
+      <table caption="Table 1. A cool table for testing" caption-side="bottom">
+        <thead>
+          <tr>
+            <th>Header</th>
+            <th>Header</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Cell</td>
+            <td>Cell</td>
+          </tr>
+        </tbody>
+      </table>
+    </li>
+    <li>
+      <p>This is another step.</p>
+    </li>
+    <li>
+      <p>This is step with a complex table.</p>
+      <table class="row-headers" caption="Table 1. Example platform management roles and actions for services in an account" caption-side="bottom" summary="The first row of the table describes separate options that you can choose from when creating a policy, and the first column describes the selected roles for the policy. The remaining cells map to the selected role from the first column, and to the selected policy from the first row to describe how the roles apply in each context."
+        id="platformrolestable1">
+        <thead>
+          <tr>
+            <th></th>
+            <th>One or all IAM-enabled services</th>
+            <th>Selected service in a resource group</th>
+            <th>Resource group access</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Viewer role</td>
+            <td>View instances, aliases, bindings, and credentials</td>
+            <td>View only specified instances in the resource group</td>
+            <td>View resource group</td>
+          </tr>
+          <tr>
+            <td>Operator role</td>
+            <td>View instances and manage aliases, bindings, and credentials</td>
+            <td>Not applicable</td>
+            <td>Not applicable</td>
+          </tr>
+          <tr>
+            <td>Editor role</td>
+            <td>Create, delete, edit, and view instances. Manage aliases, bindings, and credentials</td>
+            <td>Create, delete, edit, suspend, resume, view, and bind only specified instances in the resource group</td>
+            <td>View and edit name of resource group</td>
+          </tr>
+          <tr>
+            <td>Administrator role</td>
+            <td>All management actions for services</td>
+            <td>All management actions for the specified instances in the resource group</td>
+            <td>View, edit, and manage access for the resource group</td>
+          </tr>
+        </tbody>
+      </table>
+    </li>
+  </ol>
+  <p>This is an unordered list:</p>
+  <ul>
+    <li>
+      <p>This is a list item.</p>
+      <table caption="Table 1. A cool table for testing" caption-side="bottom">
+        <thead>
+          <tr>
+            <th>Header</th>
+            <th>Header</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Cell</td>
+            <td>Cell</td>
+          </tr>
+        </tbody>
+      </table>
+    </li>
+    <li>
+      <p>This is a list item.</p>
+    </li>
+    <li>
+      <p>This is step with a complex table.</p>
+      <table class="row-headers" caption="Table 1. Example platform management roles and actions for services in an account" caption-side="bottom" summary="The first row of the table describes separate options that you can choose from when creating a policy, and the first column describes the selected roles for the policy.  The remaining cells map to the selected role from the first column, and to the selected policy from the first row to describe how the roles apply in each context."
+        id="platformrolestable1">
+        <thead>
+          <tr>
+            <th></th>
+            <th>One or all IAM-enabled services</th>
+            <th>Selected service in a resource group</th>
+            <th>Resource group access</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Viewer role</td>
+            <td>View instances, aliases, bindings, and credentials</td>
+            <td>View only specified instances in the resource group</td>
+            <td>View resource group</td>
+          </tr>
+          <tr>
+            <td>Operator role</td>
+            <td>View instances and manage aliases, bindings, and credentials</td>
+            <td>Not applicable</td>
+            <td>Not applicable</td>
+          </tr>
+          <tr>
+            <td>Editor role</td>
+            <td>Create, delete, edit, and view instances. Manage aliases, bindings, and credentials</td>
+            <td>Create, delete, edit, suspend, resume, view, and bind only specified instances in the resource group</td>
+            <td>View and edit name of resource group</td>
+          </tr>
+          <tr>
+            <td>Administrator role</td>
+            <td>All management actions for services</td>
+            <td>All management actions for the specified instances in the resource group</td>
+            <td>View, edit, and manage access for the resource group</td>
+          </tr>
+        </tbody>
+      </table>
+    </li>
+  </ul>
+  <h2 id="videos-test">Videos</h2>
+  <h3 id="videos-test-youtube">YouTube</h3>
+  <p><img src="https://www.youtube.com/embed/h-u-5f8fZtc" alt="Watson Assistant Tooling Overview" class="video" output="iframe" width="640" height="390" id="youtubeplayer" data-script="none"></p>
+  <h3 id="video-test-mediacenter">IBM MediaCenter</h3>
+  <p><img src="https://www.kaltura.com/p/1773841/sp/177384100/embedIframeJs/uiconf_id/27941801/partner_id/1773841?iframeembed=true&amp;entry_id=1_yy71r4iv" alt="Why IBM Cloud Paks on IBM Cloud?" class="video" output="iframe" id="mediacenterplayer" frameborder="0"
+      width="560" height="315" allowfullscreen webkitallowfullscreen mozallowfullscreen></p>
+  <hr class="footnotes-sep">
+  <section class="footnotes">
+    <ol class="footnotes-list">
+      <li id="fn1" class="footnote-item">
+        <p><a href="https://tools.ietf.org/html/rfc2616#section-9.6" external>RFC 2616</a> requires that a successful resource update by a PUT request return either a <code>200</code> OK status or a <code>204</code> No Content status. Since this handbook
+          requires that a successful PUT request of any kind return the resource as represented by a GET request to the same URI, only a <code>200</code> OK status is appropriate in this case. <a href="#fnref1" class="footnote-backref">↩︎</a></p>
+      </li>
+      <li id="fn2" class="footnote-item">
+        <p>Not available for Lite accounts created after 12 August 2021. <a href="#fnref2" class="footnote-backref">↩︎</a></p>
+      </li>
+      <li id="fn3" class="footnote-item">
+        <p>Not available for Lite accounts created after 12 August 2021. <a href="#fnref3" class="footnote-backref">↩︎</a></p>
+      </li>
+      <li id="fn4" class="footnote-item">
+        <p>Icon in a comparison table <a href="#fnref4" class="footnote-backref">↩︎</a></p>
+      </li>
+      <li id="fn5" class="footnote-item">
+        <p>Text in a comparison table <a href="#fnref5" class="footnote-backref">↩︎</a></p>
+      </li>
+      <li id="fn6" class="footnote-item">
+        <p>Step 1 <a href="#fnref6" class="footnote-backref">↩︎</a></p>
+      </li>
+      <li id="fn7" class="footnote-item">
+        <p>Substep 2 <a href="#fnref7" class="footnote-backref">↩︎</a></p>
+      </li>
+      <li id="fn8" class="footnote-item">
+        <p>Fourth word in step 2 <a href="#fnref8" class="footnote-backref">↩︎</a></p>
+      </li>
+      <li id="fn9" class="footnote-item">
+        <p>Bullet 1 <a href="#fnref9" class="footnote-backref">↩︎</a></p>
+      </li>
+      <li id="fn10" class="footnote-item">
+        <p>Sub-bullet 1.2 <a href="#fnref10" class="footnote-backref">↩︎</a></p>
+      </li>
+    </ol>
+  </section>
+</body>
+</html>
