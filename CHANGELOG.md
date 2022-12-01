@@ -3,7 +3,7 @@
 This project uses [semantic versioning](http://semver.org/).
 
 ## [2.4.0] 2022-11-30
-Pick up the latest marked-it-core and add for subscript and superscript.
+Pick up the latest marked-it-core and add support for subscript and superscript.
 
 ## [2.3.3] 2022-10-31
 Pick up the latest marked-it-core and add support for bracket syntax for span tags, with a `--disable-spans` option to disable this new functionality on the command line.
