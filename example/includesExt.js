@@ -58,7 +58,7 @@ process.onExit = function cleanupTempFiles(obj, data) {
 }
 
 // regex for syntax -> [Link description](<Link>)
-const link_re = /(?:\[[^\]]*\])\(([^\)]*)\)/g;
+const link_re = /(?:\[[^\]]*\])\(([^\s)]*)(?: *"[^)]*")?\)/g;
 
 function processImageMatch(match, p1, full_mdFilePath, destDir, inputDir) {
   if(match) {
