@@ -58,7 +58,7 @@ process.onExit = function cleanupTempFiles(obj, data) {
 }
 
 // regex for syntax -> [Link description](<Link>)
-const link_re = /(?:\[[^\]]*\])\(([^\)]*)\)/g;
+const link_re = /(?:\[[^\]]*\])\(([^\s)]*)(?: +"[^"]*")?\)/g;
 
 function processImageMatch(match, p1, full_mdFilePath, destDir, inputDir) {
   if(match) {
@@ -242,7 +242,7 @@ const init = function (data) {
     let data = jsYaml.safeLoad(raw);
     data = preProcessJson(data, sourcePath);
 
-    // Write Json to yaml output back, useful to debug the processed output 
+    // Write Json to yaml output back, useful to debug the processed output
     const yamlOutput = jsYaml.safeDump(data);
     const outputFilename = FILENAME_INCLUDES_GEN_TOC_ORDER_YAML;
     const path_outputFilename = path.join(sourcePath, outputFilename);
@@ -309,18 +309,18 @@ function processKeyrefs(fileContent, data) {
     while(loopKeyrefPath) {
       currBaseDirName = currBaseDirName.trim();
       // Check empty string
-      if(currBaseDirName.length === 0) { 
+      if(currBaseDirName.length === 0) {
         // If the file referring to current Dir then use default keyref, which will be processed by lib/mdProcessor.js
         return fileContent;
       }
       let dirArr = currBaseDirName.split(path.sep);
       let lastIndex = dirArr.length - 1;
-  
+
       if(dirArr.length === 0 || dirArr[lastIndex] === '..') {
         // Return unchanged fileContent
         return fileContent;
       }
-  
+
       let full_keyrefPath = path.join(sourceDirPath, currBaseDirName, FILENAME_KEYREF);
       try {
         mdStat = fse.statSync(full_keyrefPath);
@@ -346,10 +346,10 @@ function processKeyrefs(fileContent, data) {
   if(!keyrefPath) {
     return fileContent;
   }
-  
+
   // Deep clone to avoid unintentional modification of globalKeyref
   const clone_globalKeyrefMapCopy = _.merge({}, globalKeyrefMapCopy);
-  
+
   try {
     localKeyrefMap.site.data = jsYaml.safeLoad(fse.readFileSync(keyrefPath));
   } catch {
@@ -698,7 +698,7 @@ file.dir.files.get =  function (filenames, data){
   // currentDir is the directory where generateHTML function is active
   const currentDir = data.sourcePath;
   // Ensure `${DIRNAME_INCLUDES}` dir is last entry so it gets processed last
-  if(true){ // Filter out DIRNAME_INCLUDE_SEGMENTS, and ensure 
+  if(true){ // Filter out DIRNAME_INCLUDE_SEGMENTS, and ensure
     // remove DIRNAME_INCLUDE_SEGMENTS to avoid processing it DIRNAME_INCLUDES processed at end
     let targetIndex = filenames.indexOf(DIRNAME_INCLUDE_SEGMENTS);
     if(targetIndex > -1) { // only splice array when item is found
