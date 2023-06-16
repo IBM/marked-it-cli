@@ -2,6 +2,9 @@
 
 This project uses [semantic versioning](http://semver.org/).
 
+## [2.4.2] 2023-06-16
+Pick up the latest marked-it-core.
+
 ## [2.4.1] 2023-04-05
 Fix bug with titles in image syntax in includes extension.
 
