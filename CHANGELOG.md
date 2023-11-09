@@ -2,7 +2,7 @@
 
 This project uses [semantic versioning](http://semver.org/).
 
-## [2.4.4] 2023-11-09
+## [2.4.4 and 2.4.5] 2023-11-09
 Pick up the latest marked-it-core.
 
 ## [2.4.3] 2023-07-12
