@@ -1,7 +1,7 @@
 {
 	"name": "marked-it-cli",
-	"description": "A CLI for marked-it.  Performs markdown->HTML and (optionally) TOC generation for a collection of markdown source files.",
-	"version": "2.4.5",
+	"description": "A CLI for marked-it. Performs markdown->HTML and (optionally) TOC generation for a collection of markdown source files.",
+	"version": "2.5.0",
 	"author": "Grant Gayed <grant_gayed@ca.ibm.com>",
 	"license": "MIT",
 	"homepage": "https://github.com/ibm/marked-it-cli",
@@ -29,17 +29,17 @@
 		"tests": "mocha test/testsV2.js"
 	},
 	"dependencies": {
-		"marked-it-core": "2.4.2",
+		"marked-it-core": "2.5.0",
 		"wkhtmltopdf": "0.1.5",
-		"js-yaml": "3.13.1",
+		"js-yaml": "3.15.2",
 		"htmlparser2": "3.8.3",
 		"js-beautify": "1.6.4",
-		"lodash": "4.17.21",
+		"lodash": "4.18.1",
 		"fs-extra": "1.0.0",
 		"gitignore-parser": "0.0.2",
 		"highlight.js": "11.1.0"
 	},
 	"devDependencies": {
-		"mocha": "^10.0.0"
+		"mocha": "^12.0.3"
 	}
 }

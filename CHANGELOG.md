@@ -2,6 +2,12 @@
 
 This project uses [semantic versioning](http://semver.org/).
 
+## [2.5.0] 2026-10-19
+1. Pick up marked-it-core 2.5.0.
+2. Update dependencies to address security alerts: `lodash` 4.18.1, `js-yaml` 3.15.2, and `mocha` 12.0.3 (dev dependency, requires Node.js 20.19 or later to run the tests).
+3. Fix `unescape()` to decode `&amp;` last so that `&amp;#39;` is no longer double-unescaped.
+4. Remove unnecessary escaping in the TOC version-detection regular expression.
+
 ## [2.4.4 and 2.4.5] 2023-11-09
 Pick up the latest marked-it-core.
 
