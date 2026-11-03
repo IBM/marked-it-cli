@@ -30,7 +30,7 @@
 		"tests": "mocha test/testsV2.js"
 	},
 	"dependencies": {
-		"marked-it-core": "3.0.0",
+		"marked-it-core": "github:IBM/marked-it#pull/53/head",
 		"wkhtmltopdf": "0.1.5",
 		"js-yaml": "3.15.2",
 		"htmlparser2": "3.8.3",
