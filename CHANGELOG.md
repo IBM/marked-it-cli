@@ -2,6 +2,10 @@
 
 This project uses [semantic versioning](http://semver.org/).
 
+## [3.0.0] 2026-10-17
+1. Pick up marked-it-core 3.0.0 and drop support for V1 generator (`marked`). Version 2 (`markdown-it`) is now the only supported Markdown generator.
+2. If `VERSION=1` is set in the environment or `version: 1` is specified in `toc.yaml` or `toc`, `marked-it-cli` logs a critical error and exits with code 1.
+
 ## [2.5.0] 2026-10-19
 1. Pick up marked-it-core 2.5.0.
 2. Update dependencies to address security alerts: `lodash` 4.18.1, `js-yaml` 3.15.2, and `mocha` 12.0.3 (dev dependency, requires Node.js 20.19 or later to run the tests).
