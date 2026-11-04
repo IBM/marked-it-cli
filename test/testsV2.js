@@ -19,6 +19,130 @@
 
 const assert = require('assert');
 const fs = require('fs');
+const path = require('path');
+const mdProcessor = require('../lib/mdProcessor');
+
+describe('V1 deprecation / unsupported generator', function() {
+	let originalExit;
+	let exitCode;
+	let errorMessage;
+	const testLogger = {
+		critical: function(msg) { errorMessage = msg; },
+		error: function(msg) { errorMessage = msg; },
+		warning: function() {},
+		info: function() {},
+		debug: function() {},
+		important: function() {}
+	};
+
+	beforeEach(function() {
+		originalExit = process.exit;
+		exitCode = undefined;
+		errorMessage = undefined;
+		process.exit = function(code) {
+			exitCode = code;
+			throw new Error(`process.exit called with ${code}`);
+		};
+	});
+
+	afterEach(function() {
+		process.exit = originalExit;
+		delete process.env.VERSION;
+	});
+
+	it("rejects when VERSION=1 environment variable is set", function() {
+		process.env.VERSION = "1";
+		assert.throws(function() {
+			mdProcessor.generate({ sourceDir: "test", destDir: "test-dest" }, testLogger);
+		}, /process\.exit called with 1/);
+		assert.strictEqual(exitCode, 1);
+		assert(errorMessage && errorMessage.includes("Generator version 1 (marked) is no longer supported as of marked-it-cli 3.0.0. Environment variable VERSION=1 is set."));
+	});
+
+	it("rejects when toc.yaml has version: 1", function() {
+		const tmpDir = path.join(__dirname, 'tmp-test-v1-yaml');
+		fs.mkdirSync(tmpDir, { recursive: true });
+		fs.writeFileSync(path.join(tmpDir, 'toc.yaml'), "toc:\n  properties:\n    version: 1\n");
+		try {
+			assert.throws(function() {
+				mdProcessor.generate({ sourceDir: tmpDir, destDir: "test-dest" }, testLogger);
+			}, /process\.exit called with 1/);
+			assert.strictEqual(exitCode, 1);
+			assert(errorMessage && errorMessage.includes("Generator version 1 (marked) is no longer supported as of marked-it-cli 3.0.0. Found version: 1"));
+		} finally {
+			fs.rmSync(tmpDir, { recursive: true, force: true });
+		}
+	});
+
+	it("rejects when legacy toc has version=\"1\"", function() {
+		const tmpDir = path.join(__dirname, 'tmp-test-v1-legacy');
+		fs.mkdirSync(tmpDir, { recursive: true });
+		fs.writeFileSync(path.join(tmpDir, 'toc'), 'version = "1"\n');
+		try {
+			assert.throws(function() {
+				mdProcessor.generate({ sourceDir: tmpDir, destDir: "test-dest" }, testLogger);
+			}, /process\.exit called with 1/);
+			assert.strictEqual(exitCode, 1);
+			assert(errorMessage && errorMessage.includes("Generator version 1 (marked) is no longer supported as of marked-it-cli 3.0.0. Found version=\"1\""));
+		} finally {
+			fs.rmSync(tmpDir, { recursive: true, force: true });
+		}
+	});
+
+	it("does not exit when toc.yaml has version: 2", function() {
+		const tmpSrcDir = path.join(__dirname, 'tmp-test-v2-yaml-src');
+		const tmpDestDir = path.join(__dirname, 'tmp-test-v2-yaml-dest');
+		fs.mkdirSync(tmpSrcDir, { recursive: true });
+		fs.writeFileSync(path.join(tmpSrcDir, 'toc.yaml'), "toc:\n  properties:\n    version: 2\n");
+		fs.writeFileSync(path.join(tmpSrcDir, 'index.md'), "# Test");
+		try {
+			assert.doesNotThrow(function() {
+				mdProcessor.generate({ sourceDir: tmpSrcDir, destDir: tmpDestDir }, testLogger);
+			});
+			assert.strictEqual(exitCode, undefined);
+			assert.strictEqual(errorMessage, undefined);
+		} finally {
+			fs.rmSync(tmpSrcDir, { recursive: true, force: true });
+			fs.rmSync(tmpDestDir, { recursive: true, force: true });
+		}
+	});
+
+	it("does not exit when toc.yaml does not specify version", function() {
+		const tmpSrcDir = path.join(__dirname, 'tmp-test-no-version-yaml-src');
+		const tmpDestDir = path.join(__dirname, 'tmp-test-no-version-yaml-dest');
+		fs.mkdirSync(tmpSrcDir, { recursive: true });
+		fs.writeFileSync(path.join(tmpSrcDir, 'toc.yaml'), "toc:\n  entries:\n    - title: Test\n");
+		fs.writeFileSync(path.join(tmpSrcDir, 'index.md'), "# Test");
+		try {
+			assert.doesNotThrow(function() {
+				mdProcessor.generate({ sourceDir: tmpSrcDir, destDir: tmpDestDir }, testLogger);
+			});
+			assert.strictEqual(exitCode, undefined);
+			assert.strictEqual(errorMessage, undefined);
+		} finally {
+			fs.rmSync(tmpSrcDir, { recursive: true, force: true });
+			fs.rmSync(tmpDestDir, { recursive: true, force: true });
+		}
+	});
+
+	it("does not exit when legacy toc does not specify version: 1", function() {
+		const tmpSrcDir = path.join(__dirname, 'tmp-test-legacy-v2-src');
+		const tmpDestDir = path.join(__dirname, 'tmp-test-legacy-v2-dest');
+		fs.mkdirSync(tmpSrcDir, { recursive: true });
+		fs.writeFileSync(path.join(tmpSrcDir, 'toc'), 'version = "2"\n');
+		fs.writeFileSync(path.join(tmpSrcDir, 'index.md'), "# Test");
+		try {
+			assert.doesNotThrow(function() {
+				mdProcessor.generate({ sourceDir: tmpSrcDir, destDir: tmpDestDir }, testLogger);
+			});
+			assert.strictEqual(exitCode, undefined);
+			assert.strictEqual(errorMessage, undefined);
+		} finally {
+			fs.rmSync(tmpSrcDir, { recursive: true, force: true });
+			fs.rmSync(tmpDestDir, { recursive: true, force: true });
+		}
+	});
+});
 
 describe('Command line argument tests', function() {
 	describe('--output', function() {
