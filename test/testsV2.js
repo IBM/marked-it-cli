@@ -88,6 +88,60 @@ describe('V1 deprecation / unsupported generator', function() {
 			fs.rmSync(tmpDir, { recursive: true, force: true });
 		}
 	});
+
+	it("does not exit when toc.yaml has version: 2", function() {
+		const tmpSrcDir = path.join(__dirname, 'tmp-test-v2-yaml-src');
+		const tmpDestDir = path.join(__dirname, 'tmp-test-v2-yaml-dest');
+		fs.mkdirSync(tmpSrcDir, { recursive: true });
+		fs.writeFileSync(path.join(tmpSrcDir, 'toc.yaml'), "toc:\n  properties:\n    version: 2\n");
+		fs.writeFileSync(path.join(tmpSrcDir, 'index.md'), "# Test");
+		try {
+			assert.doesNotThrow(function() {
+				mdProcessor.generate({ sourceDir: tmpSrcDir, destDir: tmpDestDir }, testLogger);
+			});
+			assert.strictEqual(exitCode, undefined);
+			assert.strictEqual(criticalMessage, undefined);
+		} finally {
+			fs.rmSync(tmpSrcDir, { recursive: true, force: true });
+			fs.rmSync(tmpDestDir, { recursive: true, force: true });
+		}
+	});
+
+	it("does not exit when toc.yaml does not specify version", function() {
+		const tmpSrcDir = path.join(__dirname, 'tmp-test-no-version-yaml-src');
+		const tmpDestDir = path.join(__dirname, 'tmp-test-no-version-yaml-dest');
+		fs.mkdirSync(tmpSrcDir, { recursive: true });
+		fs.writeFileSync(path.join(tmpSrcDir, 'toc.yaml'), "toc:\n  entries:\n    - title: Test\n");
+		fs.writeFileSync(path.join(tmpSrcDir, 'index.md'), "# Test");
+		try {
+			assert.doesNotThrow(function() {
+				mdProcessor.generate({ sourceDir: tmpSrcDir, destDir: tmpDestDir }, testLogger);
+			});
+			assert.strictEqual(exitCode, undefined);
+			assert.strictEqual(criticalMessage, undefined);
+		} finally {
+			fs.rmSync(tmpSrcDir, { recursive: true, force: true });
+			fs.rmSync(tmpDestDir, { recursive: true, force: true });
+		}
+	});
+
+	it("does not exit when legacy toc does not specify version: 1", function() {
+		const tmpSrcDir = path.join(__dirname, 'tmp-test-legacy-v2-src');
+		const tmpDestDir = path.join(__dirname, 'tmp-test-legacy-v2-dest');
+		fs.mkdirSync(tmpSrcDir, { recursive: true });
+		fs.writeFileSync(path.join(tmpSrcDir, 'toc'), 'version = "2"\n');
+		fs.writeFileSync(path.join(tmpSrcDir, 'index.md'), "# Test");
+		try {
+			assert.doesNotThrow(function() {
+				mdProcessor.generate({ sourceDir: tmpSrcDir, destDir: tmpDestDir }, testLogger);
+			});
+			assert.strictEqual(exitCode, undefined);
+			assert.strictEqual(criticalMessage, undefined);
+		} finally {
+			fs.rmSync(tmpSrcDir, { recursive: true, force: true });
+			fs.rmSync(tmpDestDir, { recursive: true, force: true });
+		}
+	});
 });
 
 describe('Command line argument tests', function() {
