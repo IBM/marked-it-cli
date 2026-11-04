@@ -25,11 +25,11 @@ const mdProcessor = require('../lib/mdProcessor');
 describe('V1 deprecation / unsupported generator', function() {
 	let originalExit;
 	let exitCode;
-	let criticalMessage;
+	let errorMessage;
 	const testLogger = {
-		critical: function(msg) { criticalMessage = msg; },
+		critical: function(msg) { errorMessage = msg; },
+		error: function(msg) { errorMessage = msg; },
 		warning: function() {},
-		error: function() {},
 		info: function() {},
 		debug: function() {},
 		important: function() {}
@@ -38,7 +38,7 @@ describe('V1 deprecation / unsupported generator', function() {
 	beforeEach(function() {
 		originalExit = process.exit;
 		exitCode = undefined;
-		criticalMessage = undefined;
+		errorMessage = undefined;
 		process.exit = function(code) {
 			exitCode = code;
 			throw new Error(`process.exit called with ${code}`);
@@ -56,7 +56,7 @@ describe('V1 deprecation / unsupported generator', function() {
 			mdProcessor.generate({ sourceDir: "test", destDir: "test-dest" }, testLogger);
 		}, /process\.exit called with 1/);
 		assert.strictEqual(exitCode, 1);
-		assert(criticalMessage && criticalMessage.includes("Generator version 1 (marked) is no longer supported as of marked-it-cli 3.0.0. Environment variable VERSION=1 is set."));
+		assert(errorMessage && errorMessage.includes("Generator version 1 (marked) is no longer supported as of marked-it-cli 3.0.0. Environment variable VERSION=1 is set."));
 	});
 
 	it("rejects when toc.yaml has version: 1", function() {
@@ -68,7 +68,7 @@ describe('V1 deprecation / unsupported generator', function() {
 				mdProcessor.generate({ sourceDir: tmpDir, destDir: "test-dest" }, testLogger);
 			}, /process\.exit called with 1/);
 			assert.strictEqual(exitCode, 1);
-			assert(criticalMessage && criticalMessage.includes("Generator version 1 (marked) is no longer supported as of marked-it-cli 3.0.0. Found version: 1"));
+			assert(errorMessage && errorMessage.includes("Generator version 1 (marked) is no longer supported as of marked-it-cli 3.0.0. Found version: 1"));
 		} finally {
 			fs.rmSync(tmpDir, { recursive: true, force: true });
 		}
@@ -83,7 +83,7 @@ describe('V1 deprecation / unsupported generator', function() {
 				mdProcessor.generate({ sourceDir: tmpDir, destDir: "test-dest" }, testLogger);
 			}, /process\.exit called with 1/);
 			assert.strictEqual(exitCode, 1);
-			assert(criticalMessage && criticalMessage.includes("Generator version 1 (marked) is no longer supported as of marked-it-cli 3.0.0. Found version=\"1\""));
+			assert(errorMessage && errorMessage.includes("Generator version 1 (marked) is no longer supported as of marked-it-cli 3.0.0. Found version=\"1\""));
 		} finally {
 			fs.rmSync(tmpDir, { recursive: true, force: true });
 		}
@@ -100,7 +100,7 @@ describe('V1 deprecation / unsupported generator', function() {
 				mdProcessor.generate({ sourceDir: tmpSrcDir, destDir: tmpDestDir }, testLogger);
 			});
 			assert.strictEqual(exitCode, undefined);
-			assert.strictEqual(criticalMessage, undefined);
+			assert.strictEqual(errorMessage, undefined);
 		} finally {
 			fs.rmSync(tmpSrcDir, { recursive: true, force: true });
 			fs.rmSync(tmpDestDir, { recursive: true, force: true });
@@ -118,7 +118,7 @@ describe('V1 deprecation / unsupported generator', function() {
 				mdProcessor.generate({ sourceDir: tmpSrcDir, destDir: tmpDestDir }, testLogger);
 			});
 			assert.strictEqual(exitCode, undefined);
-			assert.strictEqual(criticalMessage, undefined);
+			assert.strictEqual(errorMessage, undefined);
 		} finally {
 			fs.rmSync(tmpSrcDir, { recursive: true, force: true });
 			fs.rmSync(tmpDestDir, { recursive: true, force: true });
@@ -136,7 +136,7 @@ describe('V1 deprecation / unsupported generator', function() {
 				mdProcessor.generate({ sourceDir: tmpSrcDir, destDir: tmpDestDir }, testLogger);
 			});
 			assert.strictEqual(exitCode, undefined);
-			assert.strictEqual(criticalMessage, undefined);
+			assert.strictEqual(errorMessage, undefined);
 		} finally {
 			fs.rmSync(tmpSrcDir, { recursive: true, force: true });
 			fs.rmSync(tmpDestDir, { recursive: true, force: true });
