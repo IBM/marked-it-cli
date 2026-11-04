@@ -2,7 +2,7 @@
 
 This project uses [semantic versioning](http://semver.org/).
 
-## [3.0.0] 2026-10-17
+## [3.0.0] 2026-11-04
 1. Pick up marked-it-core 3.0.0 and drop support for V1 generator (`marked`). Version 2 (`markdown-it`) is now the only supported Markdown generator.
 2. If `VERSION=1` is set in the environment or `version: 1` is specified in `toc.yaml` or `toc`, `marked-it-cli` logs a critical error and exits with code 1.
 
